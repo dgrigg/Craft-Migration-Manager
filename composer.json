@@ -9,8 +9,8 @@
     }
   ],
   "support": {
-    "docs": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/blob/craft3/README.md",
-    "issues": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/issues"
+    "docs": "https://github.com/Firstborn/Craft-Migration-Manager/blob/craft3/README.md",
+    "issues": "https://github.com/Firstborn/Craft-Migration-Manager/issues"
   },
   "license": "MIT",
   "type": "craft-plugin",
@@ -32,6 +32,6 @@
     "class": "firstborn\\migrationmanager\\MigrationManager",
     "hasCpSettings": false,
     "hasCpSection": true,
-    "changelogUrl": "https://raw.githubusercontent.com/Firstborn/Craft-CMS-Migration-Manager/craft3/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/Firstborn/Craft-Migration-Manager/craft3/CHANGELOG.md"
   }
 }
