@@ -1,0 +1,52 @@
+<?php
+
+
+namespace craft\contentmigrations;
+
+use craft\db\Migration;
+//use craft\db\MigrationManager;
+//use craft\helpers\MigrationHelper;
+
+use firstborn\migrationmanager\MigrationManager;
+
+/**
+ * Generated migration
+ */
+class {{ className }} extends Migration
+{
+    /**
+    Migration manifest:
+    {% for key, value in manifest %}
+    {{ key|upper }}
+    {% for item in value %}
+    - {{ item }}
+    {% endfor %}
+    {% endfor %}
+    */
+
+	/**
+	 * Any migration code in here is wrapped inside of a transaction.
+	 * Returning false will rollback the migration
+	 *
+	 * @return bool
+	 */
+	public function safeUp()
+	{
+	    {% spaceless %}
+	    {% if empty %}
+        //add your custom migration code, see the EXAMPLES.md for examples
+        return true;
+        {% else %}
+        $json = '{{ migration|raw }}';
+
+        return MigrationManager::getInstance()->migrations->import($json);
+        {% endif %}
+        {% endspaceless %}
+    }
+
+    public function safeDown()
+    {
+        echo "{{ className }} cannot be reverted.\n";
+        return false;
+    }
+}

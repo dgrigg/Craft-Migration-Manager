@@ -1,0 +1,22 @@
+{% requirePermission 'performUpdates' %}
+{% extends "_layouts/basecp" %}
+{% set title = "Migrations"|t %}
+
+{% block pageHeader %}{% endblock %}
+
+{% block body %}
+    <div id="content">
+        <div id="graphic" class="spinner big"></div>
+        <div id="status">{{ "Preparing migrations ..."|t }}</div>
+    </div>
+{% endblock %}
+
+{% do view.registerAssetBundle('craft\\web\\assets\\cp\\CpAsset') -%}
+{% do view.registerAssetBundle('craft\\web\\assets\\updates\\UpdatesAsset') -%}
+
+{% do view.registerAssetBundle("firstborn\\migrationmanager\\assetbundles\\cp\\CpAssetBundle") %}
+
+
+{% includejs %}
+    new Craft.MigrationManagerRunner({{ data|json_encode|raw }}, '{{ nextAction }}');
+{% endincludejs %}
