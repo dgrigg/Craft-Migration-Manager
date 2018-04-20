@@ -33,8 +33,6 @@ abstract class BaseContentMigration extends BaseMigration
         $field = $fieldModel;
         $value = $parent->getFieldValue($field->handle);
 
-        Craft::error('FIELD: ' . $field->handle . ' ' .$field->className());
-
         switch ($field->className()) {
              case 'craft\redactor\Field':
                 if ($value){
@@ -77,26 +75,6 @@ abstract class BaseContentMigration extends BaseMigration
             case 'verbb\supertable\fields\SuperTableField':
                 $model = $parent[$field->handle];
 
-                /*if ($field->settings['staticField'] == 1){
-                    $value = [
-                        'new1' => [
-                            'type' => $model->typeId,
-                            'fields' => []
-                        ]
-                    ];
-                    //Craft::error();
-                    //TODO NEED TO FIGURE THIS OUT
-                    //$this->getContent($value['new1']['fields'], $model);
-                } else {
-
-                    $value = $this->getIteratorValues($model, function ($item) {
-                        $value = [
-                            'type' => $item->typeId,
-                            'fields' => []
-                        ];
-                        return $value;
-                    });
-                }*/
                 $value = $this->getIteratorValues($model, function ($item) {
                     $value = [
                         'type' => $item->typeId,

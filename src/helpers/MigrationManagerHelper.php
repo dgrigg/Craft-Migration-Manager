@@ -93,14 +93,6 @@ class MigrationManagerHelper
                 $query->filename($element['filename']);
                 $asset = $query->one();
 
-
-
-                /*$criteria = Craft::$app->elements->getCriteria(Asset::class);
-                $criteria->sourceId = $source->id;
-                $criteria->folderId = $folder->id;
-                $criteria->filename = $element['filename'];*/
-
-                //$asset = $criteria->first();
                 if ($asset) {
                     return $asset;
                 }
@@ -126,11 +118,6 @@ class MigrationManagerHelper
             $query->slug($element['slug']);
             $category = $query->one();
 
-
-            /*$criteria = Craft::$app->elements->getCriteria(Category::class);
-            $criteria->groupId = $categoryGroup->id;
-            $criteria->slug = $element['slug'];
-            $category = $criteria->first();*/
             if ($category) {
                 return $category;
             }
@@ -155,11 +142,6 @@ class MigrationManagerHelper
             $query->slug($element['slug']);
             $entry = $query->one();
 
-            /*$criteria = Craft::$app->elements->getCriteria(Entry::class);
-            $criteria->slug = $element['slug'];
-            $criteria->sectionId = $section->id;
-
-            $entry = $criteria->first();*/
             if ($entry) {
                 return $entry;
             }
@@ -199,11 +181,6 @@ class MigrationManagerHelper
             $query->slug($element['slug']);
             $tag = $query->one();
 
-            /*$criteria = Craft::$app->elements->getCriteria(ElementType::Tag);
-            $criteria->groupId = $group->id;
-            $criteria->slug = 'tag1';
-
-            $tag = $criteria->first();*/
             if ($tag) {
                 return $tag;
             }
