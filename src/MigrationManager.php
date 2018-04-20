@@ -64,9 +64,7 @@ class MigrationManager extends Plugin
      *
      */
 
-    public function label(){
-        return 'hi';
-    }
+
     public function init()
     {
         parent::init();
@@ -120,8 +118,6 @@ class MigrationManager extends Plugin
                 $event->actions[] = MigrateUserElementAction::class;
             }
         );
-
-
 
         $view = Craft::$app->getView();
         $view->registerAssetBundle(CpSideBarAssetBundle::class);
