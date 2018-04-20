@@ -4,5 +4,9 @@
 ### Added
 - Initial release for Craft 3
 
+## 3.0.1 - 2018-04-20
+### Fixed
+- Edition check for user group permissions
+
 
 
