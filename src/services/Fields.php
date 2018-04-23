@@ -36,7 +36,7 @@ class Fields extends BaseMigration
             'translationMethod' => $field->translationMethod,
             'translationKeyFormat' => $field->translationKeyFormat,
             'required' => $field->required,
-            'type' => $field->className(),
+            'type' => addslashes($field->className()),
             'typesettings' => $field->settings
         ];
 
@@ -114,7 +114,7 @@ class Fields extends BaseMigration
         $this->getSettingIds($data);
 
         $field = $fieldsService->createField([
-            'type' => str_replace('/', '\\', $data['type']),
+            'type' => $data['type'],
             'id' => $data['id'],
             'groupId' => $group->id,
             'name' => $data['name'],
@@ -192,7 +192,7 @@ class Fields extends BaseMigration
                     'handle' => $blockField->handle,
                     'instructions' => $blockField->instructions,
                     'required' => $blockField->required,
-                    'type' => $blockField->className(),
+                    'type' => addslashes($blockField->className()),
                     'translationMethod' => $blockField->translationMethod,
                     'translationKeyFormat' => $blockField->translationKeyFormat,
                     'typesettings' => $blockField->settings,
@@ -216,7 +216,8 @@ class Fields extends BaseMigration
 
     private function getSuperTableField(&$newField, $fieldId, $includeID = false)
     {
-        $blockTypes = Craft::$app->superTable->getBlockTypesByFieldId($fieldId);
+        $plugin =  Craft::$app->plugins->getPlugin('super-table');
+        $blockTypes = $plugin->service->getBlockTypesByFieldId($fieldId);
         $fieldCount = 1;
         foreach ($blockTypes as $blockType) {
             if ($includeID) {
@@ -230,16 +231,16 @@ class Fields extends BaseMigration
                 } else {
                     $fieldId = 'new'.$fieldCount;
                 }
-                $columns = array_values($newField['typesettings']['columns']);
+
                 $newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId] = [
                     'name' => $field->name,
                     'handle' => $field->handle,
                     'instructions' => $field->instructions,
                     'required' => $field->required,
-                    'type' => $field->className(),
-                    'width' => isset($columns[$fieldCount - 1]['width']) ? $columns[$fieldCount - 1]['width'] : '',
+                    'type' => addslashes($field->className()),
                     'typesettings' => $field->settings,
                 ];
+
 
                 if ($field->className() == 'craft\fields\Matrix') {
                     $this->getMatrixField($newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId], $field->id);
@@ -692,15 +693,14 @@ class Fields extends BaseMigration
     private function mergeUpdates(&$newField, $field)
     {
         $newField['id'] = $field->id;
-
         if ($newField['type'] == $field->className())
         {
-            if ($field->className() == 'Matrix')
+            if ($field->className() == 'craft\fields\Matrix')
             {
                 $this->mergeMatrix($newField, $field);
             }
 
-            if ($field->className() == 'SuperTable')
+            if ($field->className() == 'verbb\supertable\fields\SuperTableField')
             {
                 $this->mergeSuperTable($newField, $field);
             }
@@ -721,7 +721,10 @@ class Fields extends BaseMigration
     {
         $newBlockTypes = [];
         $blockTypes = $newField['typesettings']['blockTypes'];
-        $existingBlockTypes = Craft::$app->superTable->getBlockTypesByFieldId($field->id);
+
+        $plugin =  Craft::$app->plugins->getPlugin('super-table');
+        $existingBlockTypes = $plugin->service->getBlockTypesByFieldId($field->id);
+
 
         //there's only one blocktype in SuperTables to deal with
         $blockType = reset($blockTypes);
@@ -747,7 +750,7 @@ class Fields extends BaseMigration
     private function mergeSuperTableBlockType(&$newBlockType, $existingBlockType)
     {
         $newFields = [];
-        $existingFields = Craft::$app->fields->getAllFields(null, 'superTableBlockType:' . $existingBlockType->id);
+        $existingFields = Craft::$app->fields->getAllFields('superTableBlockType:' . $existingBlockType->id);
 
         foreach($newBlockType['fields'] as $key => &$tableField)
         {
@@ -790,14 +793,10 @@ class Fields extends BaseMigration
     private function mergeMatrix(&$newField, $field)
     {
         if (array_key_exists('blockTypes', $newField['typesettings'])) {
-
             $blockTypes = $newField['typesettings']['blockTypes'];
             $newBlocks = [];
-
             foreach ($blockTypes as $key => &$block) {
-
                 $existingBlock = $this->getMatrixBlockByHandle($block['handle'], $field->id);
-
                 if ($existingBlock) {
                     $this->mergeMatrixBlock($block, $existingBlock);
                     $newBlocks[$existingBlock->id] = $block;
@@ -805,11 +804,9 @@ class Fields extends BaseMigration
                     $newBlocks[$key] = $block;
                 }
             }
-
             $settings = $newField['typesettings'];
             $settings['blockTypes'] = $newBlocks;
             $newField['typesettings'] = $settings;
-
         }
     }
 
@@ -824,16 +821,14 @@ class Fields extends BaseMigration
 
         $fields = $newBlock['fields'];
         $newFields = [];
-        $existingFields = Craft::$app->fields->getAllFields(null, 'matrixBlockType:' . $block->id);
+        $existingFields = Craft::$app->fields->getAllFields('matrixBlockType:' . $block->id);
 
         foreach($fields as $key => &$field){
             $existingField = $this->getMatrixFieldByHandle($field['handle'], $existingFields);
-
             if ($existingField){
                 $this->mergeUpdates($field, $existingField);
                 $newFields[$existingField->id] = $field;
             } else {
-
                 $newFields[$key] = $field;
             }
         }

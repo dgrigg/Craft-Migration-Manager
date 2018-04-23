@@ -119,9 +119,6 @@ class MigrationManager extends Plugin
             }
         );
 
-        $view = Craft::$app->getView();
-        $view->registerAssetBundle(CpSideBarAssetBundle::class);
-
         $request = Craft::$app->getRequest();
         if ($request->getSegment(1) == 'globals'){
             $view = Craft::$app->getView();

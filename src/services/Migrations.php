@@ -231,14 +231,15 @@ class Migrations extends Component
      */
     public function import($data)
     {
-        $data = str_replace('\\', '\/', $data);
-        $data = str_replace('\/r', '\r', $data);
-        $data = str_replace('\/n', '\n', $data);
+        //$data = str_replace('\\', '\/', $data);
+        //$data = str_replace('\/r', '\r', $data);
+        //$data = str_replace('\/n', '\n', $data);
+
         $data = json_decode($data, true);
 
         $plugin = MigrationManager::getInstance();
 
-        try {
+        //try {
             if (array_key_exists('settings', $data)) {
                 // run through dependencies first to create any elements that need to be in place for fields, field layouts and other dependencies
                 foreach ($this->_settingsDependencyTypes as $key => $value) {
@@ -285,10 +286,11 @@ class Migrations extends Component
                     }
                 }
             }
-        } catch (\Exception $e) {
-            Craft::error('Exception handled: ' . $e->getMessage());
-            return false;
-        }
+        //} catch (\Exception $e) {
+         //   Craft::error('Exception handled: ' . $e->getMessage());
+         //   Craft::error()
+         //   return false;
+        //}
 
         return true;
     }
