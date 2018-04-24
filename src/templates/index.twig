@@ -14,22 +14,22 @@
 {% set tabs = {} %}
 
 {# Supported types #}
-{% set fields = craft.fields.getAllFields() -%}
+{% set fields = craft.app.fields.getAllFields() -%}
 {% if fields is not empty %}
     {% set tabs = tabs | merge({ fields: { label: 'Fields'|t, url: '#fields' } }) %}
 {% endif %}
 
-{% set sections = craft.sections.getAllSections() -%}
+{% set sections = craft.app.sections.getAllSections() -%}
 {% if sections is not empty %}
     {% set tabs = tabs | merge({ sections: { label: 'Sections'|t, url: '#sections' } }) %}
 {% endif %}
 
-{% set categories = craft.categoryGroups.getAllGroups() -%}
+{% set categories = craft.app.categoryGroups.getAllGroups() -%}
 {% if categories is not empty %}
     {% set tabs = tabs | merge({ categories: { label: 'Categories'|t, url: '#categories' } }) %}
 {% endif %}
 
-{% set globals = craft.globals.getAllSets() -%}
+{% set globals = craft.app.globals.allSets() -%}
 {% if globals is not empty %}
     {% set tabs = tabs | merge({ globals: { label: 'Globals'|t, url: '#globals' } }) %}
 {% endif %}
