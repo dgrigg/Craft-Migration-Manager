@@ -72,7 +72,7 @@
 {% set content %}
     <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
         <input type="hidden" name="action" value="migrationmanager/migrations/create-migration">
-        {{ getCsrfInput() }}
+        {{ csrfInput() }}
 
         {% set firstRendered = false %}
         {% for tabHandle, tab in tabs %}
