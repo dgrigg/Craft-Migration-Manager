@@ -24,7 +24,7 @@
     {% set tabs = tabs | merge({ sections: { label: 'Sections'|t, url: '#sections' } }) %}
 {% endif %}
 
-{% set categories = craft.categoryGroups.getAllGroups() -%}
+{% set categories = craft.app.categories.allGroups() -%}
 {% if categories is not empty %}
     {% set tabs = tabs | merge({ categories: { label: 'Categories'|t, url: '#categories' } }) %}
 {% endif %}
