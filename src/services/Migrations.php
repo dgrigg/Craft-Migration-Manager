@@ -237,6 +237,8 @@ class Migrations extends Component
 
         $data = json_decode($data, true);
 
+        Craft::error(json_encode($data));
+
         $plugin = MigrationManager::getInstance();
 
         //try {

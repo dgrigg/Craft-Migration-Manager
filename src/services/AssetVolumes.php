@@ -34,10 +34,11 @@ class AssetVolumes extends BaseMigration
 
         $this->addManifest($volume->handle);
 
+        Craft::error('export volume: '. addslashes($volume->className()));
         $newVolume = [
             'name' => $volume->name,
             'handle' => $volume->handle,
-            'type' => $volume->className(),
+            'type' => addslashes($volume->className()),
             'sortOrder' => $volume->sortOrder,
             'typesettings' => $volume->settings,
         ];
@@ -116,10 +117,10 @@ class AssetVolumes extends BaseMigration
     public function createModel(Array $data)
     {
         $volumes = Craft::$app->getVolumes();
-        $type = str_replace('/', '\\', $data['type']);
+
         $volume = $volumes->createVolume([
             'id' => array_key_exists('id', $data) ? $data['id'] : null,
-            'type' => $type,
+            'type' => $data['type'],
             'name' => $data['name'],
             'handle' => $data['handle'],
             'hasUrls' => array_key_exists('hasUrls', $data) ? $data['hasUrls'] : false,
