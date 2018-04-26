@@ -17,7 +17,7 @@ Related: [Migration Manager for Craft 2.x](https://github.com/Firstborn/Craft-CM
 "repositories": [
   {
     "type": "git",
-    "url": "https://github.com/Firstborn/Craft-CMS-Migration-Manager.git"
+    "url": "https://github.com/Firstborn/Craft-Migration-Manager.git"
   }
 ]
 ```
