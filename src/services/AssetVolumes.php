@@ -33,8 +33,6 @@ class AssetVolumes extends BaseMigration
         }
 
         $this->addManifest($volume->handle);
-
-        Craft::error('export volume: '. addslashes($volume->className()));
         $newVolume = [
             'name' => $volume->name,
             'handle' => $volume->handle,
