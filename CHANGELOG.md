@@ -20,6 +20,10 @@
 - Deprecation errors in templates
 - Null value when creating Asset Volume migration
 
+## 3.0.4 - 2018-04-26
+### Fixed
+- Fixed escaping for backslashes in settings
+
 
 
 
