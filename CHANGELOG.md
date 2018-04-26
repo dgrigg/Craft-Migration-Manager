@@ -24,6 +24,10 @@
 ### Fixed
 - Fixed escaping for backslashes in settings
 
+## 3.0.5 - 2018-04-26
+### Fixed
+- Fixed volume folder references in Asset and Redactor field settings
+
 
 
 
