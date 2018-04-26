@@ -14,22 +14,22 @@
 {% set tabs = {} %}
 
 {# Supported types #}
-{% set fields = craft.fields.getAllFields() -%}
+{% set fields = craft.app.fields.getAllFields() -%}
 {% if fields is not empty %}
     {% set tabs = tabs | merge({ fields: { label: 'Fields'|t, url: '#fields' } }) %}
 {% endif %}
 
-{% set sections = craft.sections.getAllSections() -%}
+{% set sections = craft.app.sections.getAllSections() -%}
 {% if sections is not empty %}
     {% set tabs = tabs | merge({ sections: { label: 'Sections'|t, url: '#sections' } }) %}
 {% endif %}
 
-{% set categories = craft.categoryGroups.getAllGroups() -%}
+{% set categories = craft.app.categories.allGroups() -%}
 {% if categories is not empty %}
     {% set tabs = tabs | merge({ categories: { label: 'Categories'|t, url: '#categories' } }) %}
 {% endif %}
 
-{% set globals = craft.globals.getAllSets() -%}
+{% set globals = craft.app.globals.allSets() -%}
 {% if globals is not empty %}
     {% set tabs = tabs | merge({ globals: { label: 'Globals'|t, url: '#globals' } }) %}
 {% endif %}
@@ -72,7 +72,7 @@
 {% set content %}
     <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
         <input type="hidden" name="action" value="migrationmanager/migrations/create-migration">
-        {{ getCsrfInput() }}
+        {{ csrfInput() }}
 
         {% set firstRendered = false %}
         {% for tabHandle, tab in tabs %}
@@ -120,6 +120,6 @@
 {% endset %}
 
 {% do view.registerAssetBundle("firstborn\\migrationmanager\\assetbundles\\cp\\CpAssetBundle") %}
-{% includejs %}
+{% js %}
 new Craft.MigrationManagerExport();
-{% endincludejs %}
+{% endjs %}

@@ -21,7 +21,7 @@
             <input type="hidden" name="action" value="migrationmanager/migrations/start">
             <input type="hidden" name="nextAction" value="migrationmanager/migrations/rerun">
             <input type="hidden" name="applied" value="1">
-            {{ getCsrfInput() }}
+            {{ csrfInput() }}
 
             {% for migration in migrations %}
                 <input type="checkbox" id="{{ migration }}" class="checkbox" name="migration[]" value="{{ migration }}">
