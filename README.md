@@ -9,20 +9,12 @@ Related: [Migration Manager for Craft 2.x](https://github.com/Firstborn/Craft-CM
 ### Plugin Store (the easy way)
 - In the Craft Control Panel, go to Settings -> Plugins
 - Search for 'MigrationManager'
-- click the "Install" button 
+- click the "Install" button
 
 ### Composer Command Line (the manual way)
-- Add the following code to your projects composer.json file
-```json
-"repositories": [
-  {
-    "type": "git",
-    "url": "https://github.com/Firstborn/Craft-Migration-Manager.git"
-  }
-]
-```
 - Go to the command line and `cd` to your project's root folder
-- Download the plugin via composer `composer require firstborn/craft-migration-manager`
+- Add repository to your projects composer.json file `composer config repositories.migrationmanager vcs https://github.com/Firstborn/Craft-Migration-Manager.git`
+- Download the plugin via composer `composer require firstborn/migrationmanager`
 - In the Craft Control Panel, go to Settings -> Plugins
 - Click the "Install" button for MigrationManager
 
@@ -114,7 +106,7 @@ To handle export/import of custom field types your plugin/module should listen f
 - Tags
 - UserGroups
 
-You can also listen for export/import events on pure content migrations to modify data or perform additional actions as part of a migration. 
+You can also listen for export/import events on pure content migrations to modify data or perform additional actions as part of a migration.
 
 ### Content
 - Entries
@@ -135,7 +127,7 @@ Event::on(Fields::class, Fields::EVENT_BEFORE_EXPORT_ELEMENT, function(ExportEve
 
 During the import you can modify the data before it is imported or deal with the element after it has been imported and either created or updated.
 
-Before import, the $event->element is the element model (based on handle match) to be imported (updated or created). The $event->value property is the raw data used to populate the element model. Change properties in the $event->element to modify the element before it is saved. 
+Before import, the $event->element is the element model (based on handle match) to be imported (updated or created). The $event->value property is the raw data used to populate the element model. Change properties in the $event->element to modify the element before it is saved.
 ```php
 //Custom fields
 Event::on(Fields::class, Fields::EVENT_BEFORE_IMPORT_ELEMENT, function(ExportEvent $event) {
