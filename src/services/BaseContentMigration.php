@@ -244,7 +244,7 @@ abstract class BaseContentMigration extends BaseMigration
                 switch ($element->className()) {
                     case 'craft\elements\Asset':
                         $item = [
-                            'elementType' => addslashes($element->className()),
+                            'elementType' => $element->className(),
                             'filename' => $element->filename,
                             'folder' => $element->getFolder()->name,
                             'source' => $element->getVolume()->handle
@@ -252,14 +252,14 @@ abstract class BaseContentMigration extends BaseMigration
                         break;
                     case 'craft\elements\Category':
                         $item = [
-                            'elementType' => addslashes($element->className()),
+                            'elementType' => $element->className(),
                             'slug' => $element->slug,
                             'category' => $element->getGroup()->handle
                         ];
                         break;
                     case 'craft\elements\Entry':
                         $item = [
-                            'elementType' => addslashes($element->className()),
+                            'elementType' => $element->className(),
                             'slug' => $element->slug,
                             'section' => $element->getSection()->handle
                         ];
@@ -268,7 +268,7 @@ abstract class BaseContentMigration extends BaseMigration
                         $tagValue = [];
                         $this->getContent($tagValue, $element);
                         $item = [
-                            'elementType' => addslashes($element->className()),
+                            'elementType' => $element->className(),
                             'slug' => $element->slug,
                             'group' => $element->getGroup()->handle,
                             'value' => $tagValue
@@ -276,7 +276,7 @@ abstract class BaseContentMigration extends BaseMigration
                         break;
                     case 'craft\elements\User':
                         $item = [
-                            'elementType' => addslashes($element->className()),
+                            'elementType' => $element->className(),
                             'username' => $element->username
                         ];
                         break;

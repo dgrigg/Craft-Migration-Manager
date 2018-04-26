@@ -36,7 +36,7 @@ class AssetVolumes extends BaseMigration
         $newVolume = [
             'name' => $volume->name,
             'handle' => $volume->handle,
-            'type' => addslashes($volume->className()),
+            'type' => $volume->className(),
             'sortOrder' => $volume->sortOrder,
             'typesettings' => $volume->settings,
         ];

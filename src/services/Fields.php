@@ -36,7 +36,7 @@ class Fields extends BaseMigration
             'translationMethod' => $field->translationMethod,
             'translationKeyFormat' => $field->translationKeyFormat,
             'required' => $field->required,
-            'type' => addslashes($field->className()),
+            'type' => $field->className(),
             'typesettings' => $field->settings
         ];
 
@@ -192,7 +192,7 @@ class Fields extends BaseMigration
                     'handle' => $blockField->handle,
                     'instructions' => $blockField->instructions,
                     'required' => $blockField->required,
-                    'type' => addslashes($blockField->className()),
+                    'type' => $blockField->className(),
                     'translationMethod' => $blockField->translationMethod,
                     'translationKeyFormat' => $blockField->translationKeyFormat,
                     'typesettings' => $blockField->settings,
@@ -237,7 +237,7 @@ class Fields extends BaseMigration
                     'handle' => $field->handle,
                     'instructions' => $field->instructions,
                     'required' => $field->required,
-                    'type' => addslashes($field->className()),
+                    'type' => $field->className(),
                     'typesettings' => $field->settings,
                 ];
 
