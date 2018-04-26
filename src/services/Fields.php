@@ -351,9 +351,9 @@ class Fields extends BaseMigration
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 7) == 'folder:') {
-                        $source = MigrationManagerHelper::getAssetSourceByFolderId(intval(substr($value, 7)));
+                        $source = Craft::$app->assets->getFolderById(intval(substr($value, 7)));
                         if ($source) {
-                            $field['typesettings']['sources'][$key] = $source->handle;
+                            $field['typesettings']['sources'][$key] = $source->getVolume()->handle;
                         } else {
 
                         }
@@ -363,34 +363,40 @@ class Fields extends BaseMigration
                 $field['typesettings']['sources'] = array();
             }
 
+
+
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
-                $source = Craft::$app->volumes->getVolumeById(intval($field['typesettings']['defaultUploadLocationSource']));
+                $folderId = intval(substr($field['typesettings']['defaultUploadLocationSource'],7));
+                $source = Craft::$app->assets->getFolderById($folderId);
                 if ($source) {
-                    $field['typesettings']['defaultUploadLocationSource'] = $source->handle;
+                    $field['typesettings']['defaultUploadLocationSource'] = $source->getVolume()->handle;
                 }
             }
 
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
-                $source = Craft::$app->volumes->getVolumeById(intval($field['typesettings']['singleUploadLocationSource']));
+                $folderId = intval(substr($field['typesettings']['singleUploadLocationSource'],7));
+                $source = Craft::$app->assets->getFolderById($folderId);
                 if ($source) {
-                    $field['typesettings']['singleUploadLocationSource'] = $source->handle;
+                    $field['typesettings']['singleUploadLocationSource'] = $source->getVolume()->handle;
                 }
             }
 
         }
 
         if ($field['type'] == 'craft\redactor\Field') {
-            if (array_key_exists('availableAssetSources', $field['typesettings']) && is_array($field['typesettings']['availableAssetSources'])) {
-                if ($field['typesettings']['availableAssetSources'] !== '*' && $field['typesettings']['availableAssetSources'] != '') {
-                    foreach ($field['typesettings']['availableAssetSources'] as $key => $value) {
+            if (array_key_exists('availableVolumes', $field['typesettings']) && is_array($field['typesettings']['availableVolumes'])) {
+                if ($field['typesettings']['availableVolumes'] !== '*' && $field['typesettings']['availableVolumes'] != '') {
+                    foreach ($field['typesettings']['availableVolumes'] as $key => $value) {
                         $source = Craft::$app->volumes->getVolumeById($value);
                         if ($source) {
-                            $field['typesettings']['availableAssetSources'][$key] = $source->handle;
+                            $field['typesettings']['availableVolumes'][$key] = $source->handle;
                         }
                     }
                 }
+            } elseif (array_key_exists('availableVolumes', $field['typesettings'])){
+                //leave it alone
             } else {
-                $field['typesettings']['availableAssetSources'] = array();
+                $field['typesettings']['availableVolumes'] = array();
             }
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
@@ -480,10 +486,10 @@ class Fields extends BaseMigration
 
     private function getTransformHandles(&$field)
     {
-        if ($field['type'] == 'RichText') {
+        if ($field['type'] == 'craft\redactor\Field') {
             if (array_key_exists('availableTransforms', $field['typesettings']) && is_array($field['typesettings']['availableTransforms'])) {
                 foreach ($field['typesettings']['availableTransforms'] as $key => $value) {
-                    $transform = MigrationManagerHelper::getTransformById($value);
+                    $transform = Craft::$app-> assetTransforms->getTransformById($value);
                     if ($transform) {
                         $field['typesettings']['availableTransforms'][$key] = $transform->handle;
                     }
@@ -501,7 +507,7 @@ class Fields extends BaseMigration
         $this->getSourceIds($field);
         $this->getTransformIds($field);
         //get ids for children items
-        if ($field['type'] == 'Matrix' && key_exists('blockTypes', $field['typesettings']))
+        if ($field['type'] == 'craft\fields\Matrix' && key_exists('blockTypes', $field['typesettings']))
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
@@ -510,7 +516,7 @@ class Fields extends BaseMigration
             }
         }
 
-        if ($field['type'] == 'SuperTable' && key_exists('blockTypes', $field['typesettings']))
+        if ($field['type'] == 'verbb\supertable\fields\SuperTableField' && key_exists('blockTypes', $field['typesettings']))
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
@@ -542,7 +548,7 @@ class Fields extends BaseMigration
 
     private function getTransformIds(&$field)
     {
-        if ($field['type'] == 'RichText') {
+        if ($field['type'] == 'craft\redactor\Field') {
             if (array_key_exists('availableTransforms', $field['typesettings']) && is_array($field['typesettings']['availableTransforms'])) {
                 $newTransforms = array();
                 foreach ($field['typesettings']['availableTransforms'] as $value) {
@@ -562,50 +568,66 @@ class Fields extends BaseMigration
 
     private function getSourceIds(&$field)
     {
-        if ($field['type'] == 'Assets') {
+        if ($field['type'] == 'craft\fields\Assets') {
             $newSources = array();
-
             foreach ($field['typesettings']['sources'] as $source) {
-                $newSource = MigrationManagerHelper::getAssetSourceByHandle($source);
-                if ($newSource) {
-                    $newSources[] = 'folder:' . $newSource->id;
-                } else {
-                    $this->addError('error', 'Asset source: ' . $source . ' is not defined in system');
+                $volume = Craft::$app->volumes->getVolumeByHandle($source);
+                if ($volume) {
+                    $newSource = Craft::$app->assets->getRootFolderByVolumeId($volume->id);
+                    if ($newSource) {
+                        $newSources[] = 'folder:' . $newSource->id;
+                    } else {
+                        $this->addError('error', 'Asset source: ' . $source . ' is not defined in system');
+                    }
                 }
             }
 
             $field['typesettings']['sources'] = join($newSources);
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
-                $source = MigrationManagerHelper::getAssetSourceByHandle($field['typesettings']['defaultUploadLocationSource']);
-                if ($source) {
-                    $field['typesettings']['defaultUploadLocationSource'] = $source->id;
+                $volume = Craft::$app->volumes->getVolumeByHandle($field['typesettings']['defaultUploadLocationSource']);
+                if ($volume) {
+                    $folder = Craft::$app->assets->getRootFolderByVolumeId($volume->id);
+                    if ($folder) {
+                        $field['typesettings']['defaultUploadLocationSource'] = $folder->id;
+                    } else {
+                        $field['typesettings']['defaultUploadLocationSource'] = '';
+                    }
                 } else {
                     $field['typesettings']['defaultUploadLocationSource'] = '';
                 }
             }
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
-                $source = MigrationManagerHelper::getAssetSourceByHandle($field['typesettings']['singleUploadLocationSource']);
-                if ($source) {
-                    $field['typesettings']['singleUploadLocationSource'] = $source->id;
+                $volume = Craft::$app->volumes->getVolumeByHandle($field['typesettings']['singleUploadLocationSource']);
+                if ($volume) {
+                    $folder = Craft::$app->assets->getRootFolderByVolumeId($volume->id);
+                    if ($folder) {
+                        $field['typesettings']['singleUploadLocationSource'] = $folder->id;
+                    } else {
+                        $field['typesettings']['singleUploadLocationSource'] = '';
+                    }
                 } else {
                     $field['typesettings']['singleUploadLocationSource'] = '';
                 }
             }
         }
 
-        if ($field['type'] == 'RichText') {
-            $newSources = array();
-            foreach ($field['typesettings']['availableAssetSources'] as $source) {
-                $newSource = MigrationManagerHelper::getAssetSourceByHandle($source);
-                if ($newSource) {
-                    $newSources[] = 'folder:' . $newSource->id;
-                } else {
-                    $this->addError('error', 'Asset source: ' . $source . ' is not defined in system');
+        if ($field['type'] == 'craft\redactor\Field') {
+            if (is_array($field['typesettings']['availableVolumes'])){
+                $newVolumes = array();
+                foreach ($field['typesettings']['availableVolumes'] as $volume) {
+                    $newVolume = Craft::$app->volumes->getVolumeByHandle($volume);
+                    if ($newVolume) {
+                        $newVolumes[] = $newVolume->id;
+                    } else {
+                        $this->addError('error', 'Asset volume: ' . $volume . ' is not defined in system');
+                    }
                 }
+            } else {
+                $newVolumes = $field['typesettings']['availableVolumes'];
             }
 
-            $field['typesettings']['availableAssetSources'] = $newSources;
+            $field['typesettings']['availableVolumes'] = $newVolumes;
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
                 $source = MigrationManagerHelper::getAssetSourceByHandle($field['typesettings']['defaultUploadLocationSource']);
@@ -625,7 +647,7 @@ class Fields extends BaseMigration
             }
         }
 
-        if ($field['type'] == 'Categories') {
+        if ($field['type'] == 'craft\fields\Categories') {
             $newSource = Craft::$app->categories->getGroupByHandle($field['typesettings']['source']);
             if ($newSource) {
                 $newSource = 'group:' . $newSource->id;
@@ -636,7 +658,7 @@ class Fields extends BaseMigration
         }
 
 
-        if ($field['type'] == 'Entries') {
+        if ($field['type'] == 'craft\fields\Entries') {
             $newSources = array();
             foreach ($field['typesettings']['sources'] as $source) {
                 $newSource = Craft::$app->sections->getSectionByHandle($source);
@@ -655,7 +677,7 @@ class Fields extends BaseMigration
             $field['typesettings']['sources'] = join($newSources);
         }
 
-        if ($field['type'] == 'Tags') {
+        if ($field['type'] == 'craft\fields\Tags') {
             $newSource = Craft::$app->tags->getTagGroupByHandle($field['typesettings']['source']);
             if ($newSource) {
                 $newSource = 'taggroup:' . $newSource->id;
@@ -665,7 +687,7 @@ class Fields extends BaseMigration
             $field['typesettings']['source'] = $newSource;
         }
 
-        if ($field['type'] == 'Users') {
+        if ($field['type'] == 'craft\fields\Users') {
             $newSources = array();
             foreach ($field['typesettings']['sources'] as $source) {
                 $newSource = Craft::$app->userGroups->getGroupByHandle($source);
