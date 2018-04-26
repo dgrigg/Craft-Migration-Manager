@@ -23,7 +23,7 @@
 
         <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
             <input type="hidden" name="action" value="migrationmanager/migrations/start">
-            {{ getCsrfInput() }}
+            {{ csrfInput() }}
 
             {% for migration in pending %}
                 <input type="checkbox" id="{{ migration }}" class="checkbox" name="migration[]" value="{{ migration }}">
@@ -84,6 +84,6 @@
 
 
 {% do view.registerAssetBundle("firstborn\\migrationmanager\\assetbundles\\cp\\CpAssetBundle") %}
-{% includejs %}
+{% js %}
 
-{% endincludejs %}
+{% endjs %}

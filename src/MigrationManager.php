@@ -120,7 +120,7 @@ class MigrationManager extends Plugin
         );
 
         $request = Craft::$app->getRequest();
-        if ($request->getSegment(1) == 'globals'){
+        if (!$request->getIsConsoleRequest() && $request->getSegment(1) == 'globals'){
             $view = Craft::$app->getView();
             $view->registerAssetBundle(CpGlobalsAssetBundle::class);
             $view->registerJs('new Craft.MigrationManagerGlobalsExport();', View::POS_END);
