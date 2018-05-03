@@ -73,7 +73,7 @@ class EntriesContent extends BaseContentMigration
         $primaryEntry = Entry::find()
             ->section($data['section'])
             ->slug($data['slug'])
-            ->site('default')
+            ->site(Craft::$app->sites->getPrimarySite()->handle)
             ->first();
 
         if (array_key_exists('parent', $data))
