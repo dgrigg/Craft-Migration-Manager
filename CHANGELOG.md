@@ -32,6 +32,10 @@
 ### Fixed
 - Fixed query table prefix error when retrieving field groups
 
+## 3.0.7 - 2018-05-03
+### Fixed
+- Retrieve default site handle instead of using 'default'
+- Better error reporting for Entry errors
 
 
 
