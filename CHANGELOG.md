@@ -28,6 +28,10 @@
 ### Fixed
 - Fixed volume folder references in Asset and Redactor field settings
 
+## 3.0.6 - 2018-05-02
+### Fixed
+- Fixed query table prefix error when retrieving field groups
+
 
 
 

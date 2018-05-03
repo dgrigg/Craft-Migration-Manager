@@ -92,6 +92,8 @@ class EntriesContent extends BaseContentMigration
             $this->validateImportValues($value);
             $entry->setFieldValues($value['fields']);
 
+
+
             $event = $this->onBeforeImport($entry, $value);
             if ($event->isValid) {
 
