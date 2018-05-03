@@ -103,7 +103,9 @@ class EntriesContent extends BaseContentMigration
                     $this->onAfterImport($event->element, $data);
                 } else {
                     $this->addError('error', 'Could not save the ' . $data['slug'] . ' entry.');
-                    $this->addError('error', join(',', $event->element->getErrors()));
+                    foreach ($event->element->getErrors() as $error) {
+                        $this->addError('error', join(',', $error));
+                    }
                     return false;
                 }
             } else {
