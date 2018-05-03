@@ -136,7 +136,7 @@ class Fields extends BaseMigration
     {
         $query = (new Query())
             ->select(['id', 'name'])
-            ->from(['fieldgroups'])
+            ->from(['{{%fieldgroups}}'])
             ->orderBy(['name' => SORT_DESC])
             ->where(['name' => $name]);
 
