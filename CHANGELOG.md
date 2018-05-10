@@ -37,5 +37,10 @@
 - Retrieve default site handle instead of using 'default'
 - Better error reporting for Entry errors
 
+## 3.0.8 - 2018-05-10
+### Fixed
+- Fixed a template issue when migrations run with 'backupOnUpdate' set to 'false'
+
+
 
 
