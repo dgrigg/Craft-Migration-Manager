@@ -77,6 +77,13 @@ class RunController extends Controller
                     'data' => $data,
                 ));
             }
+        } else {
+            return $this->asJson(array(
+                'alive' => true,
+                'nextStatus' => Craft::t('migrationmanager', 'Running migrations ...'),
+                'nextAction' => 'migrationmanager/run/migrations',
+                'data' => $data,
+            ));
         }
     }
 
