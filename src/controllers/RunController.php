@@ -84,7 +84,6 @@ class RunController extends Controller
                 'nextAction' => 'migrationmanager/run/migrations',
                 'data' => $data,
             ));
-
         }
     }
 
