@@ -41,6 +41,10 @@
 ### Fixed
 - Fixed a template issue when migrations run with 'backupOnUpdate' set to 'false'
 
+## 3.0.9 - 2018-05-25
+### Fixed
+- Fixed json decoding that resulted in null migration error
+
 
 
 

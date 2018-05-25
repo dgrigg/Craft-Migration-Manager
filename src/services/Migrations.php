@@ -233,14 +233,15 @@ class Migrations extends Component
      */
     public function import($data)
     {
-        //$data = str_replace('\\', '\/', $data);
-        //$data = str_replace('\/r', '\r', $data);
-        //$data = str_replace('\/n', '\n', $data);
-
+        $data = iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($data));
         $data = json_decode($data, true);
+        if (json_last_error() != JSON_ERROR_NONE){
+            Craft::error('Migration Manager JSON error');
+            Craft::error(json_last_error());
+            Craft::error(json_last_error_msg());
+        }
+
         $plugin = MigrationManager::getInstance();
-
-
         if (array_key_exists('settings', $data)) {
             // run through dependencies first to create any elements that need to be in place for fields, field layouts and other dependencies
             foreach ($this->_settingsDependencyTypes as $key => $value) {
