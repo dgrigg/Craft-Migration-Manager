@@ -45,6 +45,10 @@
 ### Fixed
 - Fixed json decoding that resulted in null migration error
 
+## 3.0.10 - 2018-05-31
+### Fixed
+- Fixed null field error for empty content migrations
+
 
 
 
