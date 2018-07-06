@@ -122,7 +122,6 @@ class Sections extends BaseMigration
 
         $event = $this->onBeforeImport($section, $data);
         if ($event->isValid) {
-           Craft::error('SECTION: ' . json_encode($section));
             if (Craft::$app->sections->saveSection($event->element)) {
                 $this->onAfterImport($event->element, $data);
                 if (!$existing) {
