@@ -399,8 +399,10 @@ abstract class BaseContentMigration extends BaseMigration
                         $items = $fieldValue->getIterator();
                         $i = 1;
                         foreach ($items as $item) {
-                            $data['fields'][$field->handle][$item->id] = $data['fields'][$field->handle]['new' . $i];
-                            unset($data['fields'][$field->handle]['new' . $i]);
+                            if (key_exists('new'. $i, $data['fields'][$field->handle])) {
+                               $data['fields'][$field->handle][$item->id] = $data['fields'][$field->handle]['new' . $i];
+                               unset($data['fields'][$field->handle]['new' . $i]);
+                            }
                             $i++;
                         }
                     }

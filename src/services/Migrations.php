@@ -272,7 +272,7 @@ class Migrations extends Component
                 }
             }
         }
-
+       
         if (array_key_exists('content', $data)) {
             foreach ($this->_contentMigrationTypes as $key => $value) {
                 $service = $plugin->get($value);

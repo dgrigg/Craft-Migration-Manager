@@ -140,9 +140,8 @@ class EntriesContent extends BaseContentMigration
         }
 
         $entry->slug = $data['slug'];
-        $entry->postDate = DateTimeHelper::toDateTime($data['postDate']);
-        $entry->expiryDate = is_null($data['expiryDate']) ? '' : DateTimeHelper::toDateTime($data['expiryDate']);
-
+        $entry->postDate = DateTimeHelper::toDateTime($data['postDate']['date']);
+        $entry->expiryDate = is_null($data['expiryDate']) ? '' : DateTimeHelper::toDateTime($data['expiryDate']['date']);
         $entry->enabled = $data['enabled'];
         $entry->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
 

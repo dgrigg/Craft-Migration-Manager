@@ -49,6 +49,12 @@
 ### Fixed
 - Fixed null field error for empty content migrations
 
+## 3.0.11 - 2018-07-06
+### Fixed
+- Fixed entry dates for content migrations
+- Fixed invalid volume error when exporting asset fields
+- Fixed null item error for custom field types
+
 
 
 

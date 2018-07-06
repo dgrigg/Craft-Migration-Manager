@@ -589,7 +589,7 @@ class Fields extends BaseMigration
                 if ($volume) {
                     $folder = Craft::$app->assets->getRootFolderByVolumeId($volume->id);
                     if ($folder) {
-                        $field['typesettings']['defaultUploadLocationSource'] = $folder->id;
+                        $field['typesettings']['defaultUploadLocationSource'] = 'folder:' . $folder->id;
                     } else {
                         $field['typesettings']['defaultUploadLocationSource'] = '';
                     }
@@ -602,7 +602,7 @@ class Fields extends BaseMigration
                 if ($volume) {
                     $folder = Craft::$app->assets->getRootFolderByVolumeId($volume->id);
                     if ($folder) {
-                        $field['typesettings']['singleUploadLocationSource'] = $folder->id;
+                        $field['typesettings']['singleUploadLocationSource'] = 'folder:' . $folder->id;
                     } else {
                         $field['typesettings']['singleUploadLocationSource'] = '';
                     }
@@ -632,7 +632,7 @@ class Fields extends BaseMigration
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
                 $source = MigrationManagerHelper::getAssetSourceByHandle($field['typesettings']['defaultUploadLocationSource']);
                 if ($source) {
-                    $field['typesettings']['defaultUploadLocationSource'] = $source->id;
+                    $field['typesettings']['defaultUploadLocationSource'] = 'folder:'.$source->id;
                 } else {
                     $field['typesettings']['defaultUploadLocationSource'] = '';
                 }
@@ -640,7 +640,7 @@ class Fields extends BaseMigration
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
                 $source = MigrationManagerHelper::getAssetSourceByHandle($field['typesettings']['singleUploadLocationSource']);
                 if ($source) {
-                    $field['typesettings']['singleUploadLocationSource'] = $source->id;
+                    $field['typesettings']['singleUploadLocationSource'] = 'folder:'.$source->id;
                 } else {
                     $field['typesettings']['singleUploadLocationSource'] = '';
                 }
