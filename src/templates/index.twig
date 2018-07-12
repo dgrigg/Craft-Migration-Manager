@@ -58,7 +58,7 @@
 
 
 {% if CraftEdition > CraftSolo %}
-    {% set userGroups = craft.userGroups.getAllGroups() -%}
+    {% set userGroups = craft.app.userGroups.allGroups -%}
     {% if userGroups is not empty %}
         {% set tabs = tabs | merge({ userGroups: { label: 'User Groups'|t, url: '#userGroups' } }) %}
     {% endif %}
