@@ -3,7 +3,7 @@
 namespace firstborn\migrationmanager\services;
 
 use firstborn\migrationmanager\helpers\MigrationManagerHelper;
-use firstborn\migrationmanager\events\ImportEvent;
+use firstborn\migrationmanager\events\ExportEvent;
 use Craft;
 use craft\fields\BaseOptionsField;
 use craft\fields\BaseRelationField;
@@ -32,6 +32,10 @@ abstract class BaseContentMigration extends BaseMigration
     {
         $field = $fieldModel;
         $value = $parent->getFieldValue($field->handle);
+   
+       Craft::error('getFieldContent: '.  $field->handle . ' ' . $field->className() );
+        
+        
 
         switch ($field->className()) {
              case 'craft\redactor\Field':
@@ -73,6 +77,7 @@ abstract class BaseContentMigration extends BaseMigration
                 });
                 break;
             case 'verbb\supertable\fields\SuperTableField':
+               
                 $model = $parent[$field->handle];
 
                 $value = $this->getIteratorValues($model, function ($item) {
@@ -95,8 +100,40 @@ abstract class BaseContentMigration extends BaseMigration
                 }
                 break;
         }
+        
+        //export the field value
+       
+        
+       
+       
+       
+        $value = $this->onBeforeExportFieldValue($field, $value);
         $content[$field->handle] = $value;
     }
+    
+    
+    /**
+     * Fires an 'onBeforeImport' event.
+     *
+     * @param Event $event
+     *          $event->params['element'] - model to be imported, manipulate this to change the model before it is saved
+     *          $event->params['value'] - data used to create the element model
+     *
+     * @return null
+     */
+    public function onBeforeExportFieldValue($element, $data)
+    {
+       Craft::error('onBeforeExportFieldValue: '. json_encode($data));
+       $event = new ExportEvent(array(
+          'element' => $element,
+          'value' => $data
+       ));
+       $this->trigger($this::EVENT_BEFORE_EXPORT_FIELD_VALUE, $event);
+       return $event->value;
+    }
+
+    
+    
 
 
     /**
@@ -104,10 +141,17 @@ abstract class BaseContentMigration extends BaseMigration
      */
     protected function validateImportValues(&$values)
     {
+       
         foreach ($values as $key => &$value) {
             $this->validateFieldValue($values, $key, $value);
         }
+        
+        
+        
+        
     }
+   
+   
 
     /**
      * @param $parent
@@ -117,8 +161,18 @@ abstract class BaseContentMigration extends BaseMigration
 
     protected function validateFieldValue($parent, $fieldHandle, &$fieldValue)
     {
-        $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
+        //$field = Craft::$app->fields->getFieldByHandle($fieldHandle);
+        
+        
+        
+        /*
+         * LEGACY STUFF IGNORE
+        Craft::error('validateFieldValue: '. $fieldHandle);
         if ($field) {
+           
+           Craft::error('IMPORT EVENT');
+           
+           
             $event = new ImportEvent(array(
                 'field' => $field,
                 'parent' => $parent,
@@ -171,6 +225,7 @@ abstract class BaseContentMigration extends BaseMigration
                 }
             }
         }
+        */
     }
 
     /**

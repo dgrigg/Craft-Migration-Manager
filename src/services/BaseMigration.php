@@ -2,6 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use firstborn\migrationmanager\events\ExportEvent;
@@ -17,6 +18,12 @@ abstract class BaseMigration extends Component implements IMigrationService
      */
 
     const EVENT_BEFORE_EXPORT_ELEMENT = 'beforeExport';
+   
+   /**
+    * @event ElementEvent The event that is triggered before an element is exported
+    */
+   
+    const EVENT_BEFORE_EXPORT_FIELD_VALUE = 'beforeExportFieldValue';
 
     /**
      * @event ElementEvent The event that is triggered before an element is imported, can be cancelled
@@ -165,6 +172,7 @@ abstract class BaseMigration extends Component implements IMigrationService
      */
     public function onBeforeExport($element , array $newElement)
     {
+       Craft::error('onBeforeExport: '. json_encode($newElement));
         $event = new ExportEvent(array(
             'element' => $element,
             'value' => $newElement
@@ -185,6 +193,7 @@ abstract class BaseMigration extends Component implements IMigrationService
      */
     public function onBeforeImport($element, array $data)
     {
+       Craft::error('onBeforeImport: '. json_encode($data));
         $event = new ImportEvent(array(
             'element' => $element,
             'value' => $data

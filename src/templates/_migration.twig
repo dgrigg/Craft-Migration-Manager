@@ -14,15 +14,22 @@ use firstborn\migrationmanager\MigrationManager;
  */
 class {{ className }} extends Migration
 {
+{% if empty == false %}
     /**
     Migration manifest:
     {% for key, value in manifest %}
+
     {{ key|upper }}
     {% for item in value %}
     - {{ item }}
     {% endfor %}
     {% endfor %}
     */
+
+private $json = <<<JSON
+{{ migration|raw }}
+JSON;
+{% endif %}
 
 	/**
 	 * Any migration code in here is wrapped inside of a transaction.
@@ -37,9 +44,7 @@ class {{ className }} extends Migration
         //add your custom migration code, see the EXAMPLES.md for examples
         return true;
         {% else %}
-        $json = '{{ migration|raw }}';
-
-        return MigrationManager::getInstance()->migrations->import($json);
+        return MigrationManager::getInstance()->migrations->import($this->json);
         {% endif %}
         {% endspaceless %}
     }
