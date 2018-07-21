@@ -59,7 +59,7 @@ class AssetTransforms extends BaseMigration
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
-
+        
         $transform = $this->createModel($data);
         $result = Craft::$app->assetTransforms->saveTransform($transform);
 
@@ -68,7 +68,6 @@ class AssetTransforms extends BaseMigration
         } else {
             $this->addError('error', 'Could not save the ' . $data['handle'] . ' field.');
         }
-
 
         return $result;
     }

@@ -31,7 +31,6 @@ class Migrations extends Component
       'site' => 'sites',
       'section' => 'sections',
       'assetVolume' => 'assetVolumes',
-      'assetTransform' => 'assetTransforms',
       'tag' => 'tags',
       'category' => 'categories',
    );
@@ -260,6 +259,7 @@ class Migrations extends Component
             }
          }
          
+         
          foreach ($this->_settingsMigrationTypes as $key => $value) {
             $service = $plugin->get($value);
             if (array_key_exists($service->getDestination(), $data['settings']['elements'])) {
@@ -354,15 +354,19 @@ class Migrations extends Component
    private function encode($str)
    {
       $str = json_encode($str, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+      $str = str_replace('\\', '\\\\', $str);
       //escape linebreaks
-      $pattern = '/(\\\\)([rn])/i';
-      $replace = '\\\\$1$2';
-      $str = preg_replace($pattern, $replace, $str);
+      //$pattern = '/(\\\\)([rn])/i';
+      //$replace = '\\\\$1$2';
+      //$str = preg_replace($pattern, $replace, $str);
+      
       return $str;
    }
    
    private function decode($data)
    {
+      Craft::error('DECODE');
+      Craft::error($data);
       $data = iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($data));
       $data = json_decode($data, TRUE);
       if (json_last_error() != JSON_ERROR_NONE) {
