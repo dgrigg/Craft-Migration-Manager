@@ -14,24 +14,30 @@ use firstborn\migrationmanager\events\ImportEvent;
 abstract class BaseMigration extends Component implements IMigrationService
 {
     /**
-     * @event ElementEvent The event that is triggered before an element is exported
+     * @event ExportEvent The event that is triggered before an element is exported
      */
 
     const EVENT_BEFORE_EXPORT_ELEMENT = 'beforeExport';
    
    /**
-    * @event ElementEvent The event that is triggered before an element is exported
+    * @event ExportEvent The event that is triggered before an element is exported
     */
    
     const EVENT_BEFORE_EXPORT_FIELD_VALUE = 'beforeExportFieldValue';
 
     /**
-     * @event ElementEvent The event that is triggered before an element is imported, can be cancelled
+     * @event ImportEvent The event that is triggered before an element is imported, can be cancelled
      */
     const EVENT_BEFORE_IMPORT_ELEMENT = 'beforeImport';
+   
+   /**
+    * @event ImportEvent The event that is triggered before an element is exported
+    */
+   
+   const EVENT_BEFORE_IMPORT_FIELD_VALUE = 'beforeImportFieldValue';
 
     /**
-     * @event ElementEvent The event that is triggered before an element is imported
+     * @event ImportEvent The event that is triggered before an element is imported
      */
     const EVENT_AFTER_IMPORT_ELEMENT = 'afterImport';
 
@@ -193,7 +199,7 @@ abstract class BaseMigration extends Component implements IMigrationService
      */
     public function onBeforeImport($element, array $data)
     {
-       Craft::error('onBeforeImport: '. json_encode($data));
+       
         $event = new ImportEvent(array(
             'element' => $element,
             'value' => $data

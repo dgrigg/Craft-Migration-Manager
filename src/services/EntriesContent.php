@@ -89,7 +89,7 @@ class EntriesContent extends BaseContentMigration
 
             $entry = $this->createModel($value);
             $this->getSourceIds($value);
-            //$this->validateImportValues(array_key_exists('fields', $value) ? $value['fields'] : []);
+            $this->validateImportValues(array_key_exists('fields', $value) ? $value['fields'] : []);
             $entry->setFieldValues(array_key_exists('fields', $value) ? $value['fields'] : []);
 
             $event = $this->onBeforeImport($entry, $value);

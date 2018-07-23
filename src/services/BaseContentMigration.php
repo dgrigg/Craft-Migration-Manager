@@ -4,6 +4,7 @@ namespace firstborn\migrationmanager\services;
 
 use firstborn\migrationmanager\helpers\MigrationManagerHelper;
 use firstborn\migrationmanager\events\ExportEvent;
+use firstborn\migrationmanager\events\ImportEvent;
 use Craft;
 use craft\fields\BaseOptionsField;
 use craft\fields\BaseRelationField;
@@ -32,11 +33,7 @@ abstract class BaseContentMigration extends BaseMigration
     {
         $field = $fieldModel;
         $value = $parent->getFieldValue($field->handle);
-   
-       Craft::error('getFieldContent: '.  $field->handle . ' ' . $field->className() );
         
-        
-
         switch ($field->className()) {
              case 'craft\redactor\Field':
                 if ($value){
@@ -102,11 +99,6 @@ abstract class BaseContentMigration extends BaseMigration
         }
         
         //export the field value
-       
-        
-       
-       
-       
         $value = $this->onBeforeExportFieldValue($field, $value);
         $content[$field->handle] = $value;
     }
@@ -132,101 +124,36 @@ abstract class BaseContentMigration extends BaseMigration
        return $event->value;
     }
 
-    
-    
-
-
     /**
      * @param $values
      */
     protected function validateImportValues(&$values)
     {
-       
         foreach ($values as $key => &$value) {
-            $this->validateFieldValue($values, $key, $value);
+            //$this->validateFieldValue($values, $key, $value);
+           $value = $this->onBeforeImportFieldValue(null, $value);
         }
-        
-        
-        
-        
     }
-   
-   
 
-    /**
-     * @param $parent
-     * @param $fieldHandle
-     * @param $fieldValue
-     */
-
-    protected function validateFieldValue($parent, $fieldHandle, &$fieldValue)
-    {
-        //$field = Craft::$app->fields->getFieldByHandle($fieldHandle);
-        
-        
-        
-        /*
-         * LEGACY STUFF IGNORE
-        Craft::error('validateFieldValue: '. $fieldHandle);
-        if ($field) {
-           
-           Craft::error('IMPORT EVENT');
-           
-           
-            $event = new ImportEvent(array(
-                'field' => $field,
-                'parent' => $parent,
-                'value' => &$fieldValue
-            ));
-
-            $this->onImportFieldContent($event);
-
-            if ($event->isValid == false) {
-                $fieldValue = $event->value;
-
-            } else {
-                switch ($field->className()) {
-                    case 'craft\fields\Matrix':
-                        foreach($fieldValue as $key => &$matrixBlock){
-                            $blockType = MigrationManagerHelper::getMatrixBlockType($matrixBlock['type'], $field->id);
-                            if ($blockType) {
-                                $blockFields = Craft::$app->fields->getAllFields(null, 'matrixBlockType:' . $blockType->id);
-                                foreach($blockFields as &$blockField){
-                                    if ($blockField->className() == 'verbb\supertable\fields\SuperTableField') {
-                                        $matrixBlockFieldValue = &$matrixBlock['fields'][$blockField->handle];
-                                        $this->updateSupertableFieldValue($matrixBlockFieldValue, $blockField);
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    case 'Neo':
-                        foreach($fieldValue as $key => &$neoBlock){
-                            $blockType = MigrationManagerHelper::getNeoBlockType($neoBlock['type'], $field->id);
-                            if ($blockType) {
-                                $blockTabs = $blockType->getFieldLayout()->getTabs();
-                                foreach($blockTabs as $blockTab){
-                                    $blockFields = $blockTab->getFields();
-                                    foreach($blockFields as &$blockTabField){
-                                        $neoBlockField = Craft::$app->fields->getFieldById($blockTabField->fieldId);
-                                        if ($neoBlockField->className() == 'verbb\supertable\fields\SuperTableField') {
-                                            $neoBlockFieldValue = &$neoBlock['fields'][$neoBlockField->handle];
-                                            $this->updateSupertableFieldValue($neoBlockFieldValue, $neoBlockField);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        break;
-                    case 'verbb\supertable\fields\SuperTableField':
-                        $this->updateSupertableFieldValue($fieldValue, $field);
-                        break;
-                }
-            }
-        }
-        */
-    }
+   /**
+    * Fires an 'onBeforeImport' event.
+    *
+    * @param Event $event
+    *          $event->params['element'] - model to be imported, manipulate this to change the model before it is saved
+    *          $event->params['value'] - data used to create the element model
+    *
+    * @return null
+    */
+   public function onBeforeImportFieldValue($element, $data)
+   {
+      Craft::error('onBeforeImportFieldValue: '. json_encode($data));
+      $event = new ImportEvent(array(
+         'element' => $element,
+         'value' => $data
+      ));
+      $this->trigger($this::EVENT_BEFORE_IMPORT_FIELD_VALUE, $event);
+      return $event->value;
+   }
 
     /**
      * @param $fieldValue
