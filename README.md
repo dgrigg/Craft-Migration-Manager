@@ -37,9 +37,11 @@ The Migration Manager can create migrations for the following tasks:
   - globals
   - users
 
-To create a migration select the elements you wish to migrate and then click the 'Create Migration' button at the bottom of the page.
+To create a migration select the elements you wish to migrate and then click the 'Create Migration' button at the bottom of the page. 
 
 ![Migration Manager](screenshots/create-migration.png)
+
+It is important to remember to create Migrations in an order that is consistent with manually creating fields, sections etc. Fields must exist before they can be added to Sections. Categories must exist before they can be used by Fields, etc. When creating migrations keep that in mind, break your migrations into smaller steps to prevent issues instead of one large migration. 
 
 A migration file will be created in the `craft/migrations` folder. The migration filename will contain the slugs/handles of the migrated items. Move the new migration file to your destination environment, ideally with version control.
 
@@ -169,6 +171,9 @@ In addition to generated migrations you can use the MigrationManger to create em
 
 View the [examples](EXAMPLES.md).
 
+To learn more about creating custom migrations:
+- [Craft CMS Official - Content Migrations](https://docs.craftcms.com/v3/content-migrations.html#creating-migrations)
+- [Craft CMS 3 Content Migration Examples](https://medium.com/mikethehud/craft-cms-3-content-migration-examples-3a377f6420c3)
 
 #### Credits
 
