@@ -8,6 +8,7 @@ use craft\helpers\App;
 use craft\helpers\FileHelper;
 use firstborn\migrationmanager\MigrationManager;
 use DateTime;
+use ForceUTF8\Encoding;
 
 class Migrations extends Component
 {
@@ -233,7 +234,7 @@ class Migrations extends Component
      */
     public function import($data)
     {
-        $data = iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($data));
+        $data = iconv('UTF-8', 'UTF-8//IGNORE', Encoding::toUTF8($data));
         $data = json_decode($data, true);
         if (json_last_error() != JSON_ERROR_NONE){
             Craft::error('Migration Manager JSON error');
@@ -272,7 +273,7 @@ class Migrations extends Component
                 }
             }
         }
-       
+
         if (array_key_exists('content', $data)) {
             foreach ($this->_contentMigrationTypes as $key => $value) {
                 $service = $plugin->get($value);

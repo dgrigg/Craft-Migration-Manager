@@ -16,7 +16,8 @@
   "type": "craft-plugin",
   "minimum-stability": "dev",
   "require": {
-    "craftcms/cms": "^3.0.0-RC1"
+    "craftcms/cms": "^3.0.0-RC1",
+    "neitanod/forceutf8": "v2.0.1"
   },
   "autoload": {
     "psr-4": {
