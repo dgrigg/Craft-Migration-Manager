@@ -1,7 +1,7 @@
 {
   "name": "firstborn/migrationmanager",
   "description": "Quickly create migrations for settings and content at the click of a mouse.",
-  "version" : "3.0.11",
+  "version": "3.0.11",
   "authors": [
     {
       "name": "Derrick Grigg",
@@ -16,15 +16,13 @@
   "type": "craft-plugin",
   "minimum-stability": "dev",
   "require": {
-    "craftcms/cms": "^3.0.0-RC1",
-    "neitanod/forceutf8": "v2.0.1"
+    "craftcms/cms": "^3.0.0-RC1"
   },
   "autoload": {
     "psr-4": {
       "firstborn\\migrationmanager\\": "src/"
     }
   },
-
   "extra": {
     "name": "Migration Manager",
     "handle": "migrationmanager",
