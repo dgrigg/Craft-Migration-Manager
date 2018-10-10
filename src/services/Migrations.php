@@ -32,7 +32,6 @@ class Migrations extends Component
         'site' => 'sites',
         'section' => 'sections',
         'assetVolume' => 'assetVolumes',
-        'assetTransform' => 'assetTransforms',
         'tag' => 'tags',
         'category' => 'categories',
     );

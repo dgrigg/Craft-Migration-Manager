@@ -10,6 +10,8 @@ use craft\elements\Category;
 use craft\elements\User;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterElementActionsEvent;
+use craft\events\RegisterUserPermissionsEvent;
+use craft\services\UserPermissions;
 use craft\web\UrlManager;
 use craft\web\View;
 use yii\base\Event;
@@ -99,25 +101,42 @@ class MigrationManager extends Plugin
                 $event->rules['migrationmanager'] = 'migrationmanager/cp/index';
             }
         );
-
-        // Register Element Actions
-        Event::on(Entry::class, Element::EVENT_REGISTER_ACTIONS,
-            function(RegisterElementActionsEvent $event) {
-                $event->actions[] = MigrateEntryElementAction::class;
-            }
-        );
-
-        Event::on(Category::class, Element::EVENT_REGISTER_ACTIONS,
-            function(RegisterElementActionsEvent $event) {
-                $event->actions[] = MigrateCategoryElementAction::class;
-            }
-        );
-
-        Event::on(User::class, Element::EVENT_REGISTER_ACTIONS,
-            function(RegisterElementActionsEvent $event) {
-                $event->actions[] = MigrateUserElementAction::class;
-            }
-        );
+   
+   
+        // Register actions only if Solo license or user has rights
+        if (Craft::$app->getEdition() > Craft::Solo && (Craft::$app->user->checkPermission('createContentMigrations') == true || Craft::$app->getUser()->getIsAdmin())
+           || Craft::$app->getEdition() === Craft::Solo) {
+           // Register Element Actions
+           Event::on(Entry::class, Element::EVENT_REGISTER_ACTIONS,
+              function (RegisterElementActionsEvent $event) {
+                 $event->actions[] = MigrateEntryElementAction::class;
+              }
+           );
+   
+           Event::on(Category::class, Element::EVENT_REGISTER_ACTIONS,
+              function (RegisterElementActionsEvent $event) {
+                 $event->actions[] = MigrateCategoryElementAction::class;
+              }
+           );
+   
+           Event::on(User::class, Element::EVENT_REGISTER_ACTIONS,
+              function (RegisterElementActionsEvent $event) {
+                 $event->actions[] = MigrateUserElementAction::class;
+              }
+           );
+        }
+   
+       Event::on(
+          UserPermissions::class,
+          UserPermissions::EVENT_REGISTER_PERMISSIONS,
+          function(RegisterUserPermissionsEvent $event) {
+             $event->permissions['Migration Manager'] = [
+                'createContentMigrations' => [
+                   'label' => 'Create content migrations',
+                ],
+             ];
+          }
+       );
 
         $request = Craft::$app->getRequest();
         if (!$request->getIsConsoleRequest() && $request->getSegment(1) == 'globals'){

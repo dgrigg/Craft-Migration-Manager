@@ -173,7 +173,8 @@ abstract class BaseContentMigration extends BaseMigration
      */
     protected function getIteratorValues($element, $settingsFunc)
     {
-        $items = $element->getIterator()->all();
+        //$items = $element->getIterator();
+        $items = $element->all();
         $value = [];
         $i = 1;
 

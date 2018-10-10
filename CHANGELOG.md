@@ -55,6 +55,19 @@
 - Fixed invalid volume error when exporting asset fields
 - Fixed null item error for custom field types
 
+## 3.0.12 - 2018-9-28
+### Fixed
+- corrected UTF 8 encoding for content migrations
+- fix Matrix block issue
+
+## 3.0.13 - 2018-10-10
+### Fixed
+- fixed asset transforms failing validation error
+- fixed deprecation errors for content migrations
+
+### Added
+- user permission to allow content migrations for non admin users
+
 
 
 

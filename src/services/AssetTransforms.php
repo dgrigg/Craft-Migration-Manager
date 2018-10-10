@@ -66,7 +66,7 @@ class AssetTransforms extends BaseMigration
         if ($result) {
             $this->onAfterImport($transform, $data);
         } else {
-            $this->addError('error', 'Could not save the ' . $data['handle'] . ' field.');
+            $this->addError('error', 'Could not save the ' . $data['handle'] . ' transform.');
         }
 
         return $result;
