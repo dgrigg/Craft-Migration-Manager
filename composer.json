@@ -23,7 +23,6 @@
       "firstborn\\migrationmanager\\": "src/"
     }
   },
-
   "extra": {
     "name": "Migration Manager",
     "handle": "migrationmanager",

@@ -74,7 +74,7 @@ class EntriesContent extends BaseContentMigration
             ->section($data['section'])
             ->slug($data['slug'])
             ->site(Craft::$app->sites->getPrimarySite()->handle)
-            ->first();
+            ->one();
 
         if (array_key_exists('parent', $data))
         {
@@ -89,7 +89,8 @@ class EntriesContent extends BaseContentMigration
 
             $entry = $this->createModel($value);
             $this->getSourceIds($value);
-            $this->validateImportValues(array_key_exists('fields', $value) ? $value['fields'] : []);
+            $fields = array_key_exists('fields', $value) ? $value['fields'] : [];
+            $this->validateImportValues($fields);
             $entry->setFieldValues(array_key_exists('fields', $value) ? $value['fields'] : []);
 
             $event = $this->onBeforeImport($entry, $value);
