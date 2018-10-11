@@ -165,6 +165,9 @@ With migrations you also have the ability to create content migrations directly 
 
  ![Pending Migration](screenshots/content-migration.png)
 
+### Permissions
+By default all users with admin rights have full access to the Migration Manager and the ability to create content migrations. Non admin users can be granted permissions to access the Migration Manager and to create content migrations in the user/permissions section of Craft. 
+
 ## Custom migrations
 
 In addition to generated migrations you can use the MigrationManger to create empty migrations that can be used for tasks like deleting fields and creating content. To create an empty migration simply click the 'Create Migration' on the Migration Manager/Create Migrations tab. A new empty migration will be added to the `craft/migrations` folder.
