@@ -64,11 +64,6 @@ class Globals extends BaseMigration
      */
     public function importItem(array $data)
     {
-        $existing = Craft::$app->globals->getSetByHandle($data['handle']);
-        if ($existing) {
-            $this->mergeUpdates($data, $existing);
-        }
-
         $set = $this->createModel($data);
 
         $event = $this->onBeforeImport($set, $data);
@@ -94,10 +89,9 @@ class Globals extends BaseMigration
      */
     public function createModel(array $data)
     {
-        $globalSet = new GlobalSet();
-        if (array_key_exists('id', $data)) {
-            $globalSet->id = $data['id'];
-            $globalSet->contentId = $data['id'];
+        $globalSet = Craft::$app->globals->getSetByHandle($data['handle']);
+        if (!$globalSet instanceof GlobalSet) {
+            $globalSet = new GlobalSet();
         }
 
         $globalSet->name = $data['name'];
@@ -130,18 +124,9 @@ class Globals extends BaseMigration
         }
 
         $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
-        $fieldLayout->type =  GlobalSet::class;
+        $fieldLayout->type = GlobalSet::class;
         $globalSet->setFieldLayout($fieldLayout);
 
         return $globalSet;
-    }
-
-    /**
-     * @param array $newSource
-     * @param GlobalSetModel $source
-     */
-    private function mergeUpdates(&$newSource, $source)
-    {
-        $newSource['id'] = $source->id;
     }
 }
