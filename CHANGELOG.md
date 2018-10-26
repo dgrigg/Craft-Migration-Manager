@@ -68,6 +68,11 @@
 ### Added
 - user permission to allow content migrations for non admin users
 
+## 3.0.14 - 2018-10-26
+### Fixed
+- fixed index conflict when importing global sets
+- fixed missing site group id for newly created site groups
+
 
 
 
