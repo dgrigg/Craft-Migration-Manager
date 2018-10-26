@@ -5,7 +5,9 @@ namespace firstborn\migrationmanager\services;
 use Craft;
 use craft\models\Site;
 use craft\models\SiteGroup;
+use craft\db\Query;
 use firstborn\migrationmanager\events\ExportEvent;
+
 
 class Sites extends BaseMigration
 {
@@ -55,17 +57,8 @@ class Sites extends BaseMigration
         if ($existing){
             $this->mergeUpdates($data, $existing);
         }
-
-        $group = $this->getSiteGroup($data['group']);
-        if (!$group){
-            $group = new SiteGroup();
-            $group->name = $data['group'];
-            Craft::$app->sites->saveGroup($group);
-        }
-
-        $data['groupId'] = $group->id;
+        
         $site = $this->createModel($data);
-
         $event = $this->onBeforeImport($site, $data);
 
         if ($event->isValid){
@@ -75,13 +68,11 @@ class Sites extends BaseMigration
            } else {
                $this->addError('error', 'Could not save the ' . $data['handle'] . ' site.');
            }
-
         } else {
             $this->addError('error', 'Error importing ' . $data['handle'] . ' site.');
             $this->addError('error', $event->error);
             return false;
         }
-
         return $result;
     }
 
@@ -95,6 +86,15 @@ class Sites extends BaseMigration
         if (array_key_exists('id', $data)) {
             $site->id = $data['id'];
         }
+       
+        $group = $this->getSiteGroup($data['group']);
+        if (!$group){
+           Craft::error('create new site');
+           $group = new SiteGroup();
+           $group->name = $data['group'];
+        }
+   
+        $data['groupId'] = $group->id;
 
         $site->name = $data['name'];
         $site->handle = $data['handle'];
@@ -116,18 +116,32 @@ class Sites extends BaseMigration
         $newSite['id'] = $site->id;
     }
 
-    /**
-     * @param $name
-     * @return SiteGroup
-     */
-
-    public function getSiteGroup($name){
-        $groups = Craft::$app->sites->getAllGroups();
-        foreach($groups as $group){
-            if ($group->name == $name){
-                return $group;
-            }
-        }
-        return false;
-    }
+  
+   /**
+    * This function is used vs Craft::$app->sites->getAllGroups() to ensure the id can
+    * be returned for newly created groups without a db commit transaction being required
+    * @param $name
+    * @return bool|SiteGroup
+    */
+   private function getSiteGroup($name)
+   {
+      $query = (new Query())
+         ->select(['id', 'name'])
+         ->from(['{{%sitegroups}}'])
+         ->orderBy(['name' => SORT_DESC])
+         ->where(['name' => $name]);
+      
+      $result = $query->one();
+      
+      if ($result){
+         $group = new SiteGroup();
+         $group->id = $result['id'];
+         $group->name = $result['name'];
+         return $group;
+         
+         
+      } else {
+         return false;
+      }
+   }
 }
