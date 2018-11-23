@@ -73,6 +73,11 @@
 - fixed index conflict when importing global sets
 - fixed missing site group id for newly created site groups
 
+## 3.0.15 - 2018-11-23
+###
+- fixed error logging issue
+
+
 
 
 

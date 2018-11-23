@@ -96,8 +96,7 @@ class Migrations extends Component
                 if ($service->hasErrors()) {
                     $errors = $service->getErrors();
                     foreach ($errors as $error) {
-
-                        Craft::error($log, __METHOD__);
+                        Craft::error($error, __METHOD__);
                     }
 
                     return false;

@@ -582,7 +582,7 @@ class Fields extends BaseMigration
                 }
             }
 
-            $field['typesettings']['sources'] = join($newSources);
+            $field['typesettings']['sources'] = $newSources;
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
                 $volume = Craft::$app->volumes->getVolumeByHandle($field['typesettings']['defaultUploadLocationSource']);
@@ -673,8 +673,8 @@ class Fields extends BaseMigration
                     $this->addError('error', 'Section : ' . $source . ' is not defined in system');
                 }
             }
-
-            $field['typesettings']['sources'] = join($newSources);
+            
+            $field['typesettings']['sources'] = $newSources;
         }
 
         if ($field['type'] == 'craft\fields\Tags') {
@@ -703,7 +703,7 @@ class Fields extends BaseMigration
                 }
             }
 
-            $field['typesettings']['sources'] = join($newSources);
+            $field['typesettings']['sources'] = $newSources;
         }
     }
 
