@@ -73,10 +73,13 @@
 - fixed index conflict when importing global sets
 - fixed missing site group id for newly created site groups
 
-## 3.0.15 - 2018-11-23
-###
+## 3.0.15 - 2018-11-27
+### Added
+- support for Neo fields (structure and content migrations)
+### Fixed
 - fixed error logging issue
-
+- fixed source error for Entry and Asset fields
+- updates for Supertable content migrations
 
 
 

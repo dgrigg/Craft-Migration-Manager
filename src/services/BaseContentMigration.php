@@ -57,7 +57,7 @@ abstract class BaseContentMigration extends BaseMigration
                     return $value;
                 });
                 break;
-            case 'Neo':
+            case 'benf\neo\Field':
                 $model = $parent[$field->handle];
                 $value = $this->getIteratorValues($model, function ($item) {
                     $itemType = $item->getType();
@@ -115,7 +115,6 @@ abstract class BaseContentMigration extends BaseMigration
      */
     public function onBeforeExportFieldValue($element, $data)
     {
-       Craft::error('onBeforeExportFieldValue: '. json_encode($data));
        $event = new ExportEvent(array(
           'element' => $element,
           'value' => $data
@@ -130,10 +129,58 @@ abstract class BaseContentMigration extends BaseMigration
     protected function validateImportValues(&$values)
     {
         foreach ($values as $key => &$value) {
-            //$this->validateFieldValue($values, $key, $value);
-           $value = $this->onBeforeImportFieldValue(null, $value);
+           $this->validateFieldValue($values, $key, $value);
+           $this->onBeforeImportFieldValue(null, $value);
         }
     }
+    
+    
+    protected function validateFieldValue($parent, $fieldHandle, &$fieldValue)
+    {
+        $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
+        if ($field) {
+           switch ($field->className()) {
+                 case 'craft\fields\Matrix':
+                    foreach($fieldValue as $key => &$matrixBlock){
+                       $blockType = MigrationManagerHelper::getMatrixBlockType($matrixBlock['type'], $field->id);
+                       if ($blockType) {
+                          $blockFields = Craft::$app->fields->getAllFields('matrixBlockType:' . $blockType->id);
+                          foreach($blockFields as &$blockField){
+                             if ($blockField->className() == 'verbb\supertable\fields\SuperTableField') {
+                                $matrixBlockFieldValue = $matrixBlock['fields'][$blockField->handle];
+                                $this->updateSupertableFieldValue($matrixBlockFieldValue, $blockField);
+                             }
+                          }
+                       }
+                    }
+                    break;
+                 case 'benf\neo\Field':
+                     foreach($fieldValue as $key => &$neoBlock){
+                         $blockType = MigrationManagerHelper::getNeoBlockType($neoBlock['type'], $field->id);
+                         if ($blockType) {
+                             $blockTabs = $blockType->getFieldLayout()->getTabs();
+                             foreach($blockTabs as $blockTab){
+                                 $blockFields = $blockTab->getFields();
+                                 foreach($blockFields as &$blockTabField){
+                                     $neoBlockField = Craft::$app->fields->getFieldById($blockTabField->fieldId);
+                                     if ($neoBlockField->className() == 'verbb\supertable\fields\SuperTableField') {
+                                         $neoBlockFieldValue = $neoBlock['fields'][$neoBlockField->handle];
+                                         $this->updateSupertableFieldValue($neoBlockFieldValue, $neoBlockField);
+                                     }
+                                 }
+                             }
+                         }
+                     }
+                     break;
+               case 'verbb\supertable\fields\SuperTableField':
+                     $this->updateSupertableFieldValue($fieldValue, $field);
+                     break;
+             }
+            //}
+        }
+
+    }
+    
 
    /**
     * Fires an 'onBeforeImport' event.
@@ -146,7 +193,6 @@ abstract class BaseContentMigration extends BaseMigration
     */
    public function onBeforeImportFieldValue($element, $data)
    {
-      Craft::error('onBeforeImportFieldValue: '. json_encode($data));
       $event = new ImportEvent(array(
          'element' => $element,
          'value' => $data
@@ -159,11 +205,16 @@ abstract class BaseContentMigration extends BaseMigration
      * @param $fieldValue
      * @param $field
      */
-    protected function updateSupertableFieldValue(&$fieldValue, $field){
-        $blockType = Craft::$app->superTable->getBlockTypesByFieldId($field->id)[0];
-        foreach ($fieldValue as $key => &$value) {
-            $value['type'] = $blockType->id;
-        }
+    protected function updateSupertableFieldValue(&$fieldValue, $field)
+    {
+       $plugin = Craft::$app->plugins->getPlugin('super-table');
+       $blockTypes = $plugin->service->getBlockTypesByFieldId($field->id);
+       if ($blockTypes) {
+          $blockType = $blockTypes[0];
+          foreach ($fieldValue as $key => &$value) {
+             $value['type'] = $blockType->id;
+          }
+       }
     }
 
     /**
@@ -377,7 +428,7 @@ abstract class BaseContentMigration extends BaseMigration
             foreach ($tab->getFields() as $tabField) {
                 $field = Craft::$app->fields->getFieldById($tabField->id);
                 $fieldValue = $element[$field->handle];
-                if ( in_array ($field->className() , ['craft\fields\Matrix', 'verbb\supertable\fields\SuperTableField', 'Neo']) ) {
+                if ( in_array ($field->className() , ['craft\fields\Matrix', 'verbb\supertable\fields\SuperTableField', 'benf\neo\Field']) ) {
                     if ($field->localizeBlocks == false) {
                         $items = $fieldValue->getIterator();
                         $i = 1;

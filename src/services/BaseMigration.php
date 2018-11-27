@@ -178,12 +178,10 @@ abstract class BaseMigration extends Component implements IMigrationService
      */
     public function onBeforeExport($element , array $newElement)
     {
-       Craft::error('onBeforeExport: '. json_encode($newElement));
         $event = new ExportEvent(array(
             'element' => $element,
             'value' => $newElement
         ));
-
         $this->trigger($this::EVENT_BEFORE_EXPORT_ELEMENT, $event);
         return $event->value;
     }

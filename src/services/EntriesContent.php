@@ -86,18 +86,17 @@ class EntriesContent extends BaseContentMigration
                 $value['id'] = $primaryEntry->id;
                 $this->localizeData($primaryEntry, $value);
             }
-
+            
             $entry = $this->createModel($value);
             $this->getSourceIds($value);
             $fields = array_key_exists('fields', $value) ? $value['fields'] : [];
             $this->validateImportValues($fields);
-            $entry->setFieldValues(array_key_exists('fields', $value) ? $value['fields'] : []);
-
+            $entry->setFieldValues($fields);
+            $value['fields'] = $fields;
             $event = $this->onBeforeImport($entry, $value);
+            
             if ($event->isValid) {
-
                 $result = Craft::$app->getElements()->saveElement($event->element);
-
                 if ($result) {
                     $this->onAfterImport($event->element, $data);
                 } else {

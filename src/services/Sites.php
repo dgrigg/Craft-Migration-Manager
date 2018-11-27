@@ -89,13 +89,11 @@ class Sites extends BaseMigration
        
         $group = $this->getSiteGroup($data['group']);
         if (!$group){
-           Craft::error('create new site');
            $group = new SiteGroup();
            $group->name = $data['group'];
         }
    
         $data['groupId'] = $group->id;
-
         $site->name = $data['name'];
         $site->handle = $data['handle'];
         $site->groupId = $data['groupId'];

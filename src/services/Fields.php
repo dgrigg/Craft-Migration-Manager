@@ -48,7 +48,7 @@ class Fields extends BaseMigration
             $this->getSuperTableField($newField, $field->id, $includeID);
         }
 
-        if ($field->className() == 'Neo'){
+        if ($field->className() == 'benf\neo\Field'){
             $this->getNeoField($newField, $field->id, $includeID);
         }
 
@@ -259,20 +259,23 @@ class Fields extends BaseMigration
      */
     private function getNeoField(&$newField, $fieldId, $includeID = false)
     {
-        $groups = Craft::$app->neo->getGroupsByFieldId($fieldId);
+       
+        $neo = Craft::$app->plugins->getPlugin('neo');
+        $groups = $neo->blockTypes->getGroupsByFieldId($fieldId);
         if (count($groups)){
-            $newField['typesettings']['groups'] = [
-                'name' => [],
-                'sortOrder' => []
-            ];
-
+            $newField['typesettings']['groups'] = [];
+            $groupId = 0;
             foreach($groups as $group){
-                $newField['typesettings']['groups']['name'][] = $group->name;
-                $newField['typesettings']['groups']['sortOrder'][] = $group->sortOrder;
+                $newField['typesettings']['groups']['uid' . $groupId] = [
+                   'name' => $group->name,
+                   'sortOrder' => $group->sortOrder
+                ];
+                $groupId ++;
             }
         }
 
-        $blockTypes = Craft::$app->neo->getBlockTypesByFieldId($fieldId);
+        $blockTypes = $neo->blockTypes->getByFieldId($fieldId);
+       
         $blockCount = 1;
         foreach ($blockTypes as $blockType)
         {
@@ -298,15 +301,13 @@ class Fields extends BaseMigration
             foreach ($fieldLayout->getTabs() as $tab) {
                 $newField['typesettings']['blockTypes'][$blockId]['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
-
-                    $newField['typesettings']['blockTypes'][$blockId]['fieldLayout'][$tab->name][] = $this->exportItem($tabField->fieldId, true);
+                    $newField['typesettings']['blockTypes'][$blockId]['fieldLayout'][$tab->name][] = $this->exportItem($tabField->id, true);
                     if ($tabField->required)
                     {
-                        $newField['typesettings']['blockTypes'][$blockId]['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                        $newField['typesettings']['blockTypes'][$blockId]['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->id)->handle;
                     }
                 }
             }
-
             ++$blockCount;
         }
     }
@@ -317,7 +318,6 @@ class Fields extends BaseMigration
 
     private function getSettingHandles(&$field)
     {
-
         $this->getSourceHandles($field);
         $this->getTransformHandles($field);
 
@@ -362,9 +362,7 @@ class Fields extends BaseMigration
             } else {
                 $field['typesettings']['sources'] = array();
             }
-
-
-
+           
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
                 $folderId = intval(substr($field['typesettings']['defaultUploadLocationSource'],7));
                 $source = Craft::$app->assets->getFolderById($folderId);
@@ -525,7 +523,7 @@ class Fields extends BaseMigration
             }
         }
 
-        if ($field['type'] == 'Neo' && key_exists('blockTypes', $field['typesettings']))
+        if ($field['type'] == 'benf\neo\Field' && key_exists('blockTypes', $field['typesettings']))
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 //import each neo field
@@ -727,7 +725,7 @@ class Fields extends BaseMigration
                 $this->mergeSuperTable($newField, $field);
             }
 
-            if ($field->className() == 'Neo')
+            if ($field->className() == 'benf\neo\Field')
             {
                 $this->mergeNeo($newField, $field);
             }
@@ -746,7 +744,6 @@ class Fields extends BaseMigration
 
         $plugin =  Craft::$app->plugins->getPlugin('super-table');
         $existingBlockTypes = $plugin->service->getBlockTypesByFieldId($field->id);
-
 
         //there's only one blocktype in SuperTables to deal with
         $blockType = reset($blockTypes);
@@ -916,19 +913,20 @@ class Fields extends BaseMigration
             $settings = $newField['typesettings'];
             $settings['blockTypes'] = $newBlocks;
             $newField['typesettings'] = $settings;
-
         }
     }
 
     private function getNeoBlockByHandle($handle, $id){
-        $blocks = craft()->neo->getBlockTypesByFieldId($id);
+   
+        $plugin = Craft::$app->plugins->getPlugin('neo');
+        $blocks = $plugin->blockTypes->getByFieldId($id);
+       
         foreach($blocks as $block)
         {
             if ($block->handle == $handle){
                 return $block;
             }
         }
-
         return false;
     }
 
