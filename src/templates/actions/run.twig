@@ -17,6 +17,6 @@
 {% do view.registerAssetBundle("firstborn\\migrationmanager\\assetbundles\\cp\\CpAssetBundle") %}
 
 
-{% includejs %}
+{% js %}
     new Craft.MigrationManagerRunner({{ data|json_encode|raw }}, '{{ nextAction }}');
-{% endincludejs %}
+{% endjs %}
