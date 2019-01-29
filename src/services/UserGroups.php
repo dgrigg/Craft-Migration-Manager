@@ -53,6 +53,7 @@ class UserGroups extends BaseMigration
                     }
                 }
             }
+            
             $newGroup['permissions'] = $this->getGroupPermissionHandles($id);
             $newGroup['settings'] = Craft::$app->systemSettings->getSettings('users');
 

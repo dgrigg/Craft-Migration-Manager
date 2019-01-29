@@ -9,6 +9,8 @@ use craft\elements\Category;
 use craft\elements\Entry;
 use craft\elements\Tag;
 use craft\elements\User;
+use craft\records\GlobalSet;
+use craft\records\TagGroup;
 
 /**
  * Class MigrationManagerHelper
@@ -202,14 +204,16 @@ class MigrationManagerHelper
 
                 if (preg_match('/entries|entrydrafts/', $permissionParts[0])) {
                     $element = Craft::$app->sections->getSectionByHandle($permissionParts[1]);
-                } elseif (preg_match('/assetsource/', $permissionParts[0])) {
-                    $element = MigrationManagerHelper::getAssetSourceByHandle($permissionParts[1]);
+                } elseif (preg_match('/volume/', $permissionParts[0])) {
+                    $element = Craft::$app->volumes->getVolumeByHandle($permissionParts[1]);
                 } elseif (preg_match('/categories/', $permissionParts[0])) {
                     $element = Craft::$app->categories->getGroupByHandle($permissionParts[1]);
+                } elseif (preg_match('/globalset/', $permissionParts[0])) {
+                    $element = Craft::$app->globals->getSetByHandle($permissionParts[1]);
                 }
 
                 if ($element != null) {
-                    $permission = $permissionParts[0].':'.$element->id;
+                    $permission = $permissionParts[0].':'. (MigrationManagerHelper::isVersion('3.1')  ? $element->uid : $element->id);
                 }
             }
         }
@@ -226,17 +230,20 @@ class MigrationManagerHelper
     {
         foreach ($permissions as &$permission) {
             //determine if permission references element, get handle if it does
-            if (preg_match('/(:\d)/', $permission)) {
+            if (preg_match('/(:\w)/', $permission)) {
                 $permissionParts = explode(":", $permission);
                 $element = null;
-
+                $hasUids = MigrationManagerHelper::isVersion('3.1');
+                
                 if (preg_match('/entries|entrydrafts/', $permissionParts[0])) {
-                    $element = Craft::$app->sections->getSectionById($permissionParts[1]);
-                } elseif (preg_match('/assetsource/', $permissionParts[0])) {
-                    $element = Craft::$app->assetSources->getSourceById($permissionParts[1]);
+                    $element = $hasUids ? Craft::$app->sections->getSectionByUid($permissionParts[1]) : Craft::$app->sections->getSectionById($permissionParts[1]);
+                } elseif (preg_match('/volume/', $permissionParts[0])) {
+                    $element = $hasUids ? Craft::$app->volumes->getVolumeByUid($permissionParts[1]) : Craft::$app->volumes->getVolumeById($permissionParts[1]);
                 } elseif (preg_match('/categories/', $permissionParts[0])) {
-                    $element = Craft::$app->categories->getGroupById($permissionParts[1]);
-                }
+                    $element = $hasUids ? Craft::$app->categories->getGroupByUid($permissionParts[1]) : Craft::$app->categories->getGroupById($permissionParts[1]);
+                } elseif (preg_match('/globalset/', $permissionParts[0])) {
+                    $element = $hasUids ? MigrationManagerHelper::getGlobalSetByUid($permissionParts[1]) : Craft::$app->globals->getSetByid($permissionParts[1]);
+                }           
 
                 if ($element != null) {
                     $permission = $permissionParts[0].':'.$element->handle;
@@ -246,4 +253,43 @@ class MigrationManagerHelper
 
         return $permissions;
     }
+
+    /**
+     * check to see if current version is greater than or equal to a version
+     */
+    public static function isVersion($version){
+        $currentVersion = Craft::$app->getVersion();
+        $version = explode('.', $version);
+        $currentVersion = explode('.', $currentVersion);
+        $isVersion = true;
+        foreach($version as $key => $value){
+            if ((int)$currentVersion[$key] < $version[$key]){ 
+                $isVersion = false;
+            }
+        }
+        return $isVersion;
+    }
+
+    /**
+     * Get a tag record by uid
+     */
+
+    public static function getTagGroupByUid(string $uid): TagGroup
+    {
+        $query = TagGroup::find();
+        $query->andWhere(['uid' => $uid]);
+        return $query->one() ?? new TagGroup();
+    }
+
+     /**
+     * Gets a global set's record by uid.
+     *
+     * @param string $uid
+     * @return GlobalSetRecord
+     */
+    public static function getGlobalSetByUid(string $uid): GlobalSet
+    {
+        return GlobalSet::findOne(['uid' => $uid]) ?? new GlobalSet();
+    }
+
 }

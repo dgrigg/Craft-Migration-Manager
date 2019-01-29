@@ -44,8 +44,6 @@
     {% set tabs = tabs | merge({ sites: { label: 'Sites'|t, url: '#sites' } }) %}
 {% endif %}
 
-
-
 {% set assetVolumes = craft.app.getVolumes().getAllVolumes() -%}
 {% if assetVolumes is not empty %}
     {% set tabs = tabs | merge({ assetVolumes: { label: 'Asset Volumes'|t, url: '#assetVolumes' } }) %}
@@ -64,8 +62,10 @@
     {% endif %}
 {% endif %}
 
-{% set other = { label: 'Other Settings'|t, url: '#other' } %}
-{% set tabs = tabs | merge({ other: other }) %}
+{% if craft.migrationManager.isVersion('3.1') == false %}
+    {% set other = { label: 'Other Settings'|t, url: '#other' } %}  
+    {% set tabs = tabs | merge({ other: other }) %}
+{% endif %}
 
 {# The content of the CP Section#}
 

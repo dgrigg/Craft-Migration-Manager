@@ -14,6 +14,7 @@ use craft\events\RegisterUserPermissionsEvent;
 use craft\services\UserPermissions;
 use craft\web\UrlManager;
 use craft\web\View;
+use craft\web\twig\variables\CraftVariable;
 use yii\base\Event;
 
 use firstborn\migrationmanager\assetbundles\cpsidebar\CpSideBarAssetBundle;
@@ -21,6 +22,8 @@ use firstborn\migrationmanager\assetbundles\cpglobals\CpGlobalsAssetBundle;
 use firstborn\migrationmanager\actions\MigrateCategoryElementAction;
 use firstborn\migrationmanager\actions\MigrateEntryElementAction;
 use firstborn\migrationmanager\actions\MigrateUserElementAction;
+use firstborn\migrationmanager\helpers\MigrationManagerHelper;
+use firstborn\migrationmanager\variables\MigrationManagerVariable;
 
 
 /**
@@ -101,7 +104,17 @@ class MigrationManager extends Plugin
                 $event->rules['migrationmanager'] = 'migrationmanager/cp/index';
             }
         );
-   
+
+        // Register variables
+        Event::on(
+            CraftVariable::class,
+            CraftVariable::EVENT_INIT,
+            function (Event $event) {
+               /** @var CraftVariable $variable */
+               $variable = $event->sender;
+               $variable->set('migrationManager', MigrationManagerVariable::class);
+            }
+         );
    
         // Register actions only if Solo license or user has rights
         if (Craft::$app->getEdition() > Craft::Solo && (Craft::$app->user->checkPermission('createContentMigrations') == true || Craft::$app->getUser()->getIsAdmin())

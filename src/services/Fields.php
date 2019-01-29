@@ -8,6 +8,7 @@ use craft\db\Query;
 use yii\base\Event;
 use firstborn\migrationmanager\events\ImportEvent;
 use firstborn\migrationmanager\events\ExportEvent;
+use firstborn\migrationmanager\helpers\MigrationManagerHelper;
 
 class Fields extends BaseMigration
 {
@@ -351,31 +352,54 @@ class Fields extends BaseMigration
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 7) == 'folder:') {
-                        $source = Craft::$app->assets->getFolderById(intval(substr($value, 7)));
+                        $folderId = substr($value, 7);
+                        $source = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->assets->getFolderByUId($folderId) : Craft::$app->assets->getFolderById(intval($folderId));
                         if ($source) {
                             $field['typesettings']['sources'][$key] = $source->getVolume()->handle;
-                        } else {
-
                         }
-                    }
+                    } else if (substr($value, 0, 7) == 'volume:') {
+                        $folderId = substr($value, 7);
+                        $source = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->volumes->getVolumeByUId($folderId) : Craft::$app->volumes->getVolumeById(intval($folderId));
+                        if ($source) {
+                            $field['typesettings']['sources'][$key] = $source->handle;
+                        }
+                    } 
                 }
             } else {
                 $field['typesettings']['sources'] = array();
             }
            
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
-                $folderId = intval(substr($field['typesettings']['defaultUploadLocationSource'],7));
-                $source = Craft::$app->assets->getFolderById($folderId);
-                if ($source) {
-                    $field['typesettings']['defaultUploadLocationSource'] = $source->getVolume()->handle;
+                $value = $field['typesettings']['defaultUploadLocationSource'];
+                if (substr($value, 0, 7) == 'folder:') {
+                    $folderId = substr($value, 7);
+                    $source = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->assets->getFolderByUId($folderId) : Craft::$app->assets->getFolderById(intval($folderId));
+                    if ($source) {
+                        $field['typesettings']['defaultUploadLocationSource'] = $source->getVolume()->handle;
+                    }
+                } else if (substr($value, 0, 7) == 'volume:') {
+                    $folderId = substr($value, 7);
+                    $source = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->volumes->getVolumeByUId($folderId) : Craft::$app->volumes->getVolumeById(intval($folderId));
+                    if ($source) {
+                        $field['typesettings']['defaultUploadLocationSource'] = $source->handle;
+                    }
                 }
             }
 
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
-                $folderId = intval(substr($field['typesettings']['singleUploadLocationSource'],7));
-                $source = Craft::$app->assets->getFolderById($folderId);
-                if ($source) {
-                    $field['typesettings']['singleUploadLocationSource'] = $source->getVolume()->handle;
+                $value = $field['typesettings']['singleUploadLocationSource'];
+                if (substr($value, 0, 7) == 'folder:') {
+                    $folderId = substr($value, 7);
+                    $source = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->assets->getFolderByUid($folderId) : Craft::$app->assets->getFolderById(intval($folderId));
+                    if ($source) {
+                        $field['typesettings']['singleUploadLocationSource'] = $source->getVolume()->handle;
+                    }
+                } else if (substr($value, 0, 7) == 'volume:') {
+                    $folderId = substr($value, 7);
+                    $source = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->volumes->getVolumeByUid($folderId) : Craft::$app->volumes->getVolumeById(intval($folderId));
+                    if ($source) {
+                        $field['typesettings']['singleUploadLocationSource'] = $source->handle;
+                    }
                 }
             }
 
@@ -385,7 +409,7 @@ class Fields extends BaseMigration
             if (array_key_exists('availableVolumes', $field['typesettings']) && is_array($field['typesettings']['availableVolumes'])) {
                 if ($field['typesettings']['availableVolumes'] !== '*' && $field['typesettings']['availableVolumes'] != '') {
                     foreach ($field['typesettings']['availableVolumes'] as $key => $value) {
-                        $source = Craft::$app->volumes->getVolumeById($value);
+                        $source = Craft::$app->volumes->getVolumeById(intval($value));
                         if ($source) {
                             $field['typesettings']['availableVolumes'][$key] = $source->handle;
                         }
@@ -398,7 +422,8 @@ class Fields extends BaseMigration
             }
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
-                $source = Craft::$app->volumes->getVolumeById(intval($field['typesettings']['defaultUploadLocationSource']));
+                $value = $field['typesettings']['defaultUploadLocationSource'];
+                $source = Craft::$app->volumes->getVolumeById(intval($value));
                 if ($source) {
                     $field['typesettings']['defaultUploadLocationSource'] = $source->handle;
                 }
@@ -406,30 +431,28 @@ class Fields extends BaseMigration
             }
 
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
-                $source = Craft::$app->volumes->getVolumeById(intval($field['typesettings']['singleUploadLocationSource']));
+                $value = $field['typesettings']['singleUploadLocationSource'];
+                $source = Craft::$app->volumes->getVolumeById(intval($value));
+                
                 if ($source) {
                     $field['typesettings']['singleUploadLocationSource'] = $source->handle;
                 }
             }
+
         }
 
         if ($field['type'] == 'craft\fields\Categories') {
             if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
                 $value = $field['typesettings']['source'];
                 if (substr($value, 0, 6) == 'group:') {
-                    $categories = Craft::$app->categories->getAllGroupIds();
-                    $categoryId = intval(substr($value, 6));
-                    if (in_array($categoryId, $categories))
-                    {
-                        $category = Craft::$app->categories->getGroupById($categoryId);
-                        if ($category) {
-                            $field['typesettings']['source'] = $category->handle;
-                        } else {
-                            $field['typesettings']['source'] = [];
-                        }
+                    $categoryId = substr($value, 6);
+                    $category = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->categories->getGroupByUid($categoryId) : Craft::$app->categories->getGroupById(intval($categoryId));
+                    if ($category) {
+                        $field['typesettings']['source'] = $category->handle;
                     } else {
-                        $this->addError('error', 'Can not export field: ' . $field['handle'] . ' category id: ' . $categoryId . ' does not exist in system');
+                        $field['typesettings']['source'] = [];
                     }
+                   
                 }
             }
         }
@@ -438,7 +461,8 @@ class Fields extends BaseMigration
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 8) == 'section:') {
-                        $section = Craft::$app->sections->getSectionById(intval(substr($value, 8)));
+                        $value = substr($value, 8);
+                        $section = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->sections->getSectionByUid($value) : Craft::$app->sections->getSectionById(intval($value));
                         if ($section) {
                             $field['typesettings']['sources'][$key] = $section->handle;
                         }
@@ -453,7 +477,8 @@ class Fields extends BaseMigration
             if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
                 $value = $field['typesettings']['source'];
                 if (substr($value, 0, 9) == 'taggroup:') {
-                    $tag = Craft::$app->tags->getTagGroupById(intval(substr($value, 9)));
+                    $value = substr($value, 9);
+                    $tag = MigrationManagerHelper::isVersion('3.1') ?  MigrationManagerHelper::getTagGroupByUid($value) : Craft::$app->tags->getTagGroupById(intval($value));
                     if ($tag) {
                         $field['typesettings']['source'] = $tag->handle;
                     }
@@ -466,7 +491,9 @@ class Fields extends BaseMigration
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 6) == 'group:') {
-                        $userGroup = Craft::$app->userGroups->getGroupById(intval(substr($value, 6)));
+                        $value = substr($value, 6);
+                        $userGroup = MigrationManagerHelper::isVersion('3.1') ? Craft::$app->userGroups->getGroupByUid($value) : Craft::$app->userGroups->getGroupById(intval($value));
+
                         if ($userGroup) {
                             $field['typesettings']['sources'][$key] = $userGroup->handle;
                         }
@@ -573,7 +600,7 @@ class Fields extends BaseMigration
                 if ($volume) {
                     $newSource = Craft::$app->assets->getRootFolderByVolumeId($volume->id);
                     if ($newSource) {
-                        $newSources[] = 'folder:' . $newSource->id;
+                        $newSources[] = 'folder:' . (MigrationManagerHelper::isVersion('3.1') ? $newSource->uid : $newSource->id);
                     } else {
                         $this->addError('error', 'Asset source: ' . $source . ' is not defined in system');
                     }
@@ -587,7 +614,7 @@ class Fields extends BaseMigration
                 if ($volume) {
                     $folder = Craft::$app->assets->getRootFolderByVolumeId($volume->id);
                     if ($folder) {
-                        $field['typesettings']['defaultUploadLocationSource'] = 'folder:' . $folder->id;
+                        $field['typesettings']['defaultUploadLocationSource'] = 'folder:' . (MigrationManagerHelper::isVersion('3.1') ? $folder->uid : $folder->id);
                     } else {
                         $field['typesettings']['defaultUploadLocationSource'] = '';
                     }
@@ -600,7 +627,7 @@ class Fields extends BaseMigration
                 if ($volume) {
                     $folder = Craft::$app->assets->getRootFolderByVolumeId($volume->id);
                     if ($folder) {
-                        $field['typesettings']['singleUploadLocationSource'] = 'folder:' . $folder->id;
+                        $field['typesettings']['singleUploadLocationSource'] = 'folder:' . (MigrationManagerHelper::isVersion('3.1') ? $folder->uid : $folder->id);
                     } else {
                         $field['typesettings']['singleUploadLocationSource'] = '';
                     }
@@ -648,7 +675,7 @@ class Fields extends BaseMigration
         if ($field['type'] == 'craft\fields\Categories') {
             $newSource = Craft::$app->categories->getGroupByHandle($field['typesettings']['source']);
             if ($newSource) {
-                $newSource = 'group:' . $newSource->id;
+                $newSource = 'group:' . (MigrationManagerHelper::isVersion('3.1') ?  $newSource->uid : $newSource->id);
             } else {
                 $this->addError('error', 'Category: ' . $field['typesettings']['source'] . ' is not defined in system');
             }
@@ -662,7 +689,7 @@ class Fields extends BaseMigration
                 $newSource = Craft::$app->sections->getSectionByHandle($source);
                 if ($newSource)
                 {
-                    $newSources[] = 'section:' . $newSource->id;
+                    $newSources[] = 'section:' . (MigrationManagerHelper::isVersion('3.1') ? $newSource->uid : $newSource->id);
                 }
                 elseif ($source == 'singles')
                 {
@@ -678,7 +705,7 @@ class Fields extends BaseMigration
         if ($field['type'] == 'craft\fields\Tags') {
             $newSource = Craft::$app->tags->getTagGroupByHandle($field['typesettings']['source']);
             if ($newSource) {
-                $newSource = 'taggroup:' . $newSource->id;
+                $newSource = 'taggroup:' . (MigrationManagerHelper::isVersion('3.1') ? $newSource->uid : $newSource->id);
             } else {
                 $this->addError('error', 'Tag: ' . $field['typesettings']['source'] . ' is not defined in system');
             }
@@ -691,7 +718,7 @@ class Fields extends BaseMigration
                 $newSource = Craft::$app->userGroups->getGroupByHandle($source);
                 if ($newSource)
                 {
-                    $newSources[] = 'group:' . $newSource->id;
+                    $newSources[] = 'group:' . (MigrationManagerHelper::isVersion('3.1') ? $newSource->uid : $newSource->id);
                 }
                 elseif ($source == 'admins')
                 {
