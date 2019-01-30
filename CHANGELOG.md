@@ -1,5 +1,13 @@
 # Migration Manager Changelog
 
+## 3.0.17 - 2019-01-30
+
+### Fixed
+
+- fixed issue creating migrations for Matrix fields
+- updated support for SuperTable and Neo 3.1 releases
+- removed Routes from migration options for Craft 3.1 + (database routes not supported in Craft 3.1, moved to project config)
+
 ## 3.0.16 - 2019-01-28 [CRITICAL]
 
 ### Fixed

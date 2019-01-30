@@ -37,6 +37,7 @@ class Fields extends BaseMigration
             'translationMethod' => $field->translationMethod,
             'translationKeyFormat' => $field->translationKeyFormat,
             'required' => $field->required,
+            'searchable' => (empty($field->searchable) ? true : $field->searchable),
             'type' => $field->className(),
             'typesettings' => $field->settings
         ];
@@ -114,7 +115,7 @@ class Fields extends BaseMigration
         //go get any extra settings that need to be set based on handles
         $this->getSettingIds($data);
 
-        $field = $fieldsService->createField([
+        $fieldData = [
             'type' => $data['type'],
             'id' => $data['id'],
             'groupId' => $group->id,
@@ -124,7 +125,13 @@ class Fields extends BaseMigration
             'translationMethod' => $data['translationMethod'],
             'translationKeyFormat' => $data['translationKeyFormat'],
             'settings' => $data['typesettings']
-        ]);
+        ];
+
+        if (MigrationManagerHelper::isVersion('3.1')){
+            $fieldData['searchable'] = empty($data['searchable']) ? true : $data['searchable'];
+        }
+        
+        $field = $fieldsService->createField($fieldData);
 
         return $field;
     }
@@ -250,6 +257,7 @@ class Fields extends BaseMigration
                 ++$fieldCount;
             }
         }
+
         unset($newField['typesettings']['columns']);
     }
 
@@ -532,6 +540,7 @@ class Fields extends BaseMigration
         $this->getSourceIds($field);
         $this->getTransformIds($field);
         //get ids for children items
+
         if ($field['type'] == 'craft\fields\Matrix' && key_exists('blockTypes', $field['typesettings']))
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
@@ -543,7 +552,9 @@ class Fields extends BaseMigration
 
         if ($field['type'] == 'verbb\supertable\fields\SuperTableField' && key_exists('blockTypes', $field['typesettings']))
         {
+
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
+                
                 foreach ($blockType['fields'] as &$childField) {
                     $this->getSettingIds($childField);
                 }
@@ -740,6 +751,7 @@ class Fields extends BaseMigration
     private function mergeUpdates(&$newField, $field)
     {
         $newField['id'] = $field->id;
+
         if ($newField['type'] == $field->className())
         {
             if ($field->className() == 'craft\fields\Matrix')
@@ -768,7 +780,6 @@ class Fields extends BaseMigration
     {
         $newBlockTypes = [];
         $blockTypes = $newField['typesettings']['blockTypes'];
-
         $plugin =  Craft::$app->plugins->getPlugin('super-table');
         $existingBlockTypes = $plugin->service->getBlockTypesByFieldId($field->id);
 
@@ -796,8 +807,10 @@ class Fields extends BaseMigration
     private function mergeSuperTableBlockType(&$newBlockType, $existingBlockType)
     {
         $newFields = [];
-        $existingFields = Craft::$app->fields->getAllFields('superTableBlockType:' . $existingBlockType->id);
 
+        $context = 'superTableBlockType:' . (MigrationManagerHelper::isVersion('3.1') ? $existingBlockType->uid : $existingBlockType->id );
+        $existingFields = Craft::$app->fields->getAllFields($context);
+        
         foreach($newBlockType['fields'] as $key => &$tableField)
         {
             $existingField = $this->getSuperTableFieldByHandle($tableField['handle'], $existingFields);
@@ -863,11 +876,12 @@ class Fields extends BaseMigration
     private function mergeMatrixBlock(&$newBlock, $block)
     {
         $newBlock['fieldLayoutId'] = $block->fieldLayoutId;
-        $newBlock['sortOrder'] = $block->sortOrder;
-
+        $newBlock['sortOrder'] = $block->sortOrder;       
         $fields = $newBlock['fields'];
         $newFields = [];
-        $existingFields = Craft::$app->fields->getAllFields('matrixBlockType:' . $block->id);
+
+        $context = 'matrixBlockType:' . (MigrationManagerHelper::isVersion('3.1') ? $block->uid : $block->id );
+        $existingFields = Craft::$app->fields->getAllFields($context);
 
         foreach($fields as $key => &$field){
             $existingField = $this->getMatrixFieldByHandle($field['handle'], $existingFields);
