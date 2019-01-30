@@ -1,7 +1,7 @@
 {
   "name": "firstborn/migrationmanager",
   "description": "Quickly create migrations for settings and content at the click of a mouse.",
-  "version": "3.0.16",
+  "version": "3.0.17",
   "authors": [
     {
       "name": "Derrick Grigg",
