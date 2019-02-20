@@ -61,7 +61,8 @@ class MigrationManagerHelper
      */
     public static function getNeoBlockType($handle, $fieldId)
     {
-        $blockTypes = Craft::$app->neo->getBlockTypesByFieldId($fieldId);
+        $neo = Craft::$app->getPlugins()->getPlugin('neo');
+        $blockTypes = $neo->blockTypes->getByFieldId($fieldId);
         foreach ($blockTypes as $block) {
             if ($block->handle == $handle) {
                 return $block;

@@ -162,7 +162,7 @@ abstract class BaseContentMigration extends BaseMigration
                              foreach($blockTabs as $blockTab){
                                  $blockFields = $blockTab->getFields();
                                  foreach($blockFields as &$blockTabField){
-                                     $neoBlockField = Craft::$app->fields->getFieldById($blockTabField->fieldId);
+                                     $neoBlockField = Craft::$app->fields->getFieldById($blockTabField->fieldId ?? $blockTabField->id);
                                      if ($neoBlockField->className() == 'verbb\supertable\fields\SuperTableField') {
                                          $neoBlockFieldValue = $neoBlock['fields'][$neoBlockField->handle];
                                          $this->updateSupertableFieldValue($neoBlockFieldValue, $neoBlockField);
