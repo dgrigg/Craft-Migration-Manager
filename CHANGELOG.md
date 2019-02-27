@@ -1,5 +1,14 @@
 # Migration Manager Changelog
 
+## 3.0.18 - 2019-02-27
+
+### Fixed
+
+- fixed JSON encoding error with environment variables, switched to NOWDOC vs HEREDOC
+- fixed migration file name bug when name contained accented characters
+- fixed color field content migration bug that resulted in empty field values
+-
+
 ## 3.0.17 - 2019-01-30
 
 ### Fixed
