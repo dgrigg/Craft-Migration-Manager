@@ -89,6 +89,10 @@ abstract class BaseContentMigration extends BaseMigration
             case 'craft\fields\Dropdown':
                 $value = $value->value;
                 break;
+            case 'craft\fields\Color':
+                //need to make sure hex value goes a string
+                $value = (string)$value;
+                break;
             default:
                 if ($field instanceof BaseRelationField) {
                     $this->getSourceHandles($value);
@@ -175,10 +179,8 @@ abstract class BaseContentMigration extends BaseMigration
                case 'verbb\supertable\fields\SuperTableField':
                      $this->updateSupertableFieldValue($fieldValue, $field);
                      break;
-             }
-            //}
+            }
         }
-
     }
     
 

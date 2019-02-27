@@ -8,6 +8,7 @@ use craft\helpers\App;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use firstborn\migrationmanager\MigrationManager;
+use firstborn\migrationmanager\helpers\MigrationManagerHelper;
 use DateTime;
 
 class Migrations extends Component
@@ -194,7 +195,7 @@ class Migrations extends Component
 
         if (!$empty || count($description)>0) {
             $description = implode('_', $description);
-            $name .= '_' . $description;
+            $name .= '_' . MigrationManagerHelper::slugify($description);
         }
 
         $filename = sprintf($name, $date->format('ymd_His'));
@@ -215,7 +216,7 @@ class Migrations extends Component
 
         $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         //escape backslashes
-        $migration = str_replace('\\', '\\\\', $migration);
+        //$migration = str_replace('\\', '\\\\', $migration);
 
         $content = Craft::$app->view->renderTemplate('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
 

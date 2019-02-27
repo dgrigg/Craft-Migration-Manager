@@ -115,7 +115,7 @@ class AssetVolumes extends BaseMigration
     public function createModel(Array $data)
     {
         $volumes = Craft::$app->getVolumes();
-
+        
         $volume = $volumes->createVolume([
             'id' => array_key_exists('id', $data) ? $data['id'] : null,
             'type' => $data['type'],
