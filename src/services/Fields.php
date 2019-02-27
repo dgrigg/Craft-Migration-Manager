@@ -246,6 +246,8 @@ class Fields extends BaseMigration
                     'instructions' => $field->instructions,
                     'required' => $field->required,
                     'type' => $field->className(),
+                    'translationMethod' => $field->translationMethod,
+                    'translationKeyFormat' => $field->translationKeyFormat,
                     'typesettings' => $field->settings,
                 ];
 

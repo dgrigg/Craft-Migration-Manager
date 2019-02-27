@@ -4,6 +4,7 @@ namespace firstborn\migrationmanager\services;
 
 use Craft;
 use firstborn\migrationmanager\events\ExportEvent;
+use craft\elements\Asset;
 use craft\volumes\Local;
 use craft\volumes\MissingVolume;
 
