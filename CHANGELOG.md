@@ -1,5 +1,11 @@
 # Migration Manager Changelog
 
+## 3.0.19 - 2019-02-27
+
+### Fixed
+
+- fixed issues for Neo field content migrations
+
 ## 3.0.18 - 2019-02-27
 
 ### Fixed
