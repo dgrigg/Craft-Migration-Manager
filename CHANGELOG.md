@@ -7,7 +7,11 @@
 - fixed JSON encoding error with environment variables, switched to NOWDOC vs HEREDOC
 - fixed migration file name bug when name contained accented characters
 - fixed color field content migration bug that resulted in empty field values
--
+- fixed missing use in AssetVolumes
+
+### Added
+
+- translation support for Supertable fields
 
 ## 3.0.17 - 2019-01-30
 
