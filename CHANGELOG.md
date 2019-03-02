@@ -1,5 +1,11 @@
 # Migration Manager Changelog
 
+## 3.0.20 - 2019-03-01
+
+### Fixed
+
+- fixed a bug with SuperTable nested in Matrix field that caused content to be orphaned during migrations
+
 ## 3.0.19 - 2019-02-27
 
 ### Fixed

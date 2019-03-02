@@ -809,7 +809,6 @@ class Fields extends BaseMigration
     private function mergeSuperTableBlockType(&$newBlockType, $existingBlockType)
     {
         $newFields = [];
-
         $context = 'superTableBlockType:' . (MigrationManagerHelper::isVersion('3.1') ? $existingBlockType->uid : $existingBlockType->id );
         $existingFields = Craft::$app->fields->getAllFields($context);
         
@@ -819,7 +818,7 @@ class Fields extends BaseMigration
 
             if ($existingField)
             {
-                if ($tableField['type'] == 'Matrix'){
+                if ($tableField['type'] == 'craft\fields\Matrix'){
                     $this->mergeMatrix($tableField, $existingField);
                 }
 
@@ -857,6 +856,7 @@ class Fields extends BaseMigration
             $blockTypes = $newField['typesettings']['blockTypes'];
             $newBlocks = [];
             foreach ($blockTypes as $key => &$block) {
+              
                 $existingBlock = $this->getMatrixBlockByHandle($block['handle'], $field->id);
                 if ($existingBlock) {
                     $this->mergeMatrixBlock($block, $existingBlock);
@@ -929,7 +929,6 @@ class Fields extends BaseMigration
                 return $block;
             }
         }
-
         return false;
     }
 
