@@ -1,5 +1,11 @@
 # Migration Manager Changelog
 
+## 3.0.20.1 - 2019-03-04
+
+### Fixed
+
+- bump version for Packagist
+
 ## 3.0.20 - 2019-03-01
 
 ### Fixed
