@@ -1,13 +1,11 @@
 {
   "name": "firstborn/migrationmanager",
   "description": "Quickly create migrations for settings and content at the click of a mouse.",
-  "version": "3.0.20.1",
-  "authors": [
-    {
-      "name": "Derrick Grigg",
-      "email": "derrick.grigg@firstborn.com"
-    }
-  ],
+  "version": "3.0.21",
+  "authors": [{
+    "name": "Derrick Grigg",
+    "email": "derrick.grigg@firstborn.com"
+  }],
   "support": {
     "docs": "https://github.com/Firstborn/Craft-Migration-Manager/blob/master/README.md",
     "issues": "https://github.com/Firstborn/Craft-Migration-Manager/issues"

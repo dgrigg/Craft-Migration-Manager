@@ -1,5 +1,15 @@
 # Migration Manager Changelog
 
+## 3.0.21 - 2019-03-05
+
+### Fixed
+
+- fixed invalid entry type issue with section migrations for 'single' section types
+
+### Added
+
+- additional error logging for failed migrations
+
 ## 3.0.20.1 - 2019-03-04
 
 ### Fixed

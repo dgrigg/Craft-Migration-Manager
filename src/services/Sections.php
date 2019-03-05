@@ -8,6 +8,7 @@ use craft\models\Section_SiteSettings;
 use craft\models\EntryType;
 use craft\models\Entry;
 use firstborn\migrationmanager\events\ExportEvent;
+use firstborn\migrationmanager\helpers\MigrationManagerHelper;
 
 
 class Sections extends BaseMigration
@@ -120,39 +121,45 @@ class Sections extends BaseMigration
 
         $section = $this->createModel($data);
 
-        $event = $this->onBeforeImport($section, $data);
-        if ($event->isValid) {
-            if (Craft::$app->sections->saveSection($event->element)) {
-                $this->onAfterImport($event->element, $data);
-                if (!$existing) {
-                    //wipe out the default entry type
-                    $defaultEntryType = Craft::$app->sections->getEntryTypesBySectionId($section->id);
-                    if ($defaultEntryType) {
-                        Craft::$app->sections->deleteEntryTypeById($defaultEntryType[0]->id);
+        if ($section !== false){
+            $event = $this->onBeforeImport($section, $data);
+            if ($event->isValid) {
+                if (Craft::$app->sections->saveSection($event->element)) {
+                    $this->onAfterImport($event->element, $data);
+                   
+                    //only need for sections pre project config 
+                    if (!MigrationManagerHelper::isVersion('3.1') && !$existing) {
+                        //wipe out the default entry type
+                        $defaultEntryType = Craft::$app->sections->getEntryTypesBySectionId($section->id);
+                        if ($defaultEntryType) {
+                            Craft::$app->sections->deleteEntryTypeById($defaultEntryType[0]->id);
+                        }
                     }
+
+                    //add entry types
+                    foreach ($data['entrytypes'] as $key => $newEntryType) {
+                        $existingType = $this->getSectionEntryTypeByHandle($newEntryType['handle'], $section->id);
+                        if ($existingType) {
+                            $this->mergeEntryType($newEntryType, $existingType);
+                        }
+
+                        $entryType = $this->createEntryType($newEntryType, $section);
+
+                        if (!Craft::$app->sections->saveEntryType($entryType)) {
+                            $result = false;
+                        }
+                    }
+                } else {
+                    $this->addError('error', 'Could not save the ' . $data['handle'] . ' section.');
+                    $result = false;
                 }
 
-                //add entry types
-                foreach ($data['entrytypes'] as $key => $newEntryType) {
-                    $existingType = $this->getSectionEntryTypeByHandle($newEntryType['handle'], $section->id);
-                    if ($existingType) {
-                        $this->mergeEntryType($newEntryType, $existingType);
-                    }
-
-                    $entryType = $this->createEntryType($newEntryType, $section);
-
-                    if (!Craft::$app->sections->saveEntryType($entryType)) {
-                        $result = false;
-                    }
-                }
             } else {
-                $this->addError('error', 'Could not save the ' . $data['handle'] . ' section.');
-                $result = false;
+                $this->addError('error', 'Error importing ' . $data['handle'] . ' section.');
+                $this->addError('error', $event->error);
+                return false;
             }
-
         } else {
-            $this->addError('error', 'Error importing ' . $data['handle'] . ' section.');
-            $this->addError('error', $event->error);
             return false;
         }
 
@@ -185,13 +192,19 @@ class Sections extends BaseMigration
             foreach ($data['sites'] as $key => $siteData) {
                 //determine if locale exists
                 $site = Craft::$app->getSites()->getSiteByHandle($key);
-                $siteSettings = new Section_SiteSettings();
-                $siteSettings->siteId = $site->id;
-                $siteSettings->hasUrls = $siteData['hasUrls'];
-                $siteSettings->uriFormat = $siteData['uriFormat'];
-                $siteSettings->template = $siteData['template'];
-                $siteSettings->enabledByDefault = (bool)$siteData['enabledByDefault'];
-                $allSiteSettings[$site->id] = $siteSettings;
+
+                if ($site){
+                    $siteSettings = new Section_SiteSettings();
+                    $siteSettings->siteId = $site->id;
+                    $siteSettings->hasUrls = $siteData['hasUrls'];
+                    $siteSettings->uriFormat = $siteData['uriFormat'];
+                    $siteSettings->template = $siteData['template'];
+                    $siteSettings->enabledByDefault = (bool)$siteData['enabledByDefault'];
+                    $allSiteSettings[$site->id] = $siteSettings;
+                } else {
+                    $this->addError('error', 'Error importing ' . $data['handle'] . ' section, site ' . $key . ' is not defined.');
+                    return false;
+                }
             }
         }
 

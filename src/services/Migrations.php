@@ -7,6 +7,7 @@ use craft\base\Component;
 use craft\helpers\App;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
+use craft\errors\MigrationException;
 use firstborn\migrationmanager\MigrationManager;
 use firstborn\migrationmanager\helpers\MigrationManagerHelper;
 use DateTime;
@@ -236,9 +237,9 @@ class Migrations extends Component
         $data = iconv('UTF-8', 'UTF-8//IGNORE', StringHelper::convertToUtf8($data));
         $data = json_decode($data, true);
         if (json_last_error() != JSON_ERROR_NONE){
-            Craft::error('Migration Manager JSON error');
-            Craft::error(json_last_error());
-            Craft::error(json_last_error_msg());
+            Craft::error('Migration Manager JSON error', __METHOD__);
+            Craft::error(json_last_error(), __METHOD__);
+            Craft::error(json_last_error_msg(), __METHOD__);
         }
 
         $plugin = MigrationManager::getInstance();
@@ -247,11 +248,12 @@ class Migrations extends Component
             foreach ($this->_settingsDependencyTypes as $key => $value) {
                 $service = $plugin->get($value);
                 if (array_key_exists($service->getDestination(), $data['settings']['dependencies'])) {
+                   
                     $service->import($data['settings']['dependencies'][$service->getDestination()]);
                     if ($service->hasErrors()) {
                         $errors = $service->getErrors();
                         foreach ($errors as $error) {
-                            Craft::error($error);
+                            Craft::error($error , __METHOD__);
                         }
                         return false;
                     }
@@ -265,7 +267,7 @@ class Migrations extends Component
                     if ($service->hasErrors()) {
                         $errors = $service->getErrors();
                         foreach ($errors as $error) {
-                            Craft::error($error);
+                            Craft::error($error, __METHOD__);
                         }
                         return false;
                     }
@@ -281,7 +283,7 @@ class Migrations extends Component
                     if ($service->hasErrors()) {
                         $errors = $service->getErrors();
                         foreach ($errors as $error) {
-                            Craft::error($error);
+                            Craft::error($error, __METHOD__);
                         }
                         return false;
                     }
@@ -327,7 +329,8 @@ class Migrations extends Component
                 $migrator->migrateUp($migrationName);
             } catch (MigrationException $e) {
                 Craft::error('Migration failed. The rest of the migrations are cancelled.', __METHOD__);
-                throw $e;
+                //throw $e;
+                return false;
             }
         }
 
