@@ -1,3 +1,9 @@
+# Deprecated
+
+[Migration Manager](https://github.com/Firstborn/Craft-Migration-Manager) is now [Migration Assistant](https://github.com/dgrigg/craft-migration-assistant). We have transitioned to a paid plugin in order to provide better support and updates going forward. As Craft continues to grow and evolve and more people take advantage of simplified migrations via the Migration Manager, it was becoming difficult to provide a level of support and responsiveness that people needed when depending on this plugin to help manage their Craft sites. The current free version of Migration Manager will remain available for a period of time to ensure a smooth transition for everyone using the plugin. Thank you to everyone who used this plugin and offered feedback to make it better.
+
+## [See Migration Assistant](https://github.com/dgrigg/craft-migration-assistant)
+
 # Migration Manager for [Craft CMS 3](https://craftcms.com/)
 
 Create migrations to easily move settings and content between CraftCMS website installations with the click of a mouse, no coding required. You can select which elements to migrate and create a native Craft content migration file that can be committed to your version control system. The migration(s) can then be applied on different CraftCMS installations to instantly create and update settings and content, without needing to enter data multiple times. By using migrations you can ensure your various website environments (local, staging, production, etc.) stay in sync and up to date.
@@ -7,11 +13,13 @@ Related: [Migration Manager for Craft 2.x](https://github.com/Firstborn/Craft-CM
 ## Installation
 
 ### Plugin Store (the easy way)
+
 - In the Craft Control Panel, go to Settings -> Plugins
 - Search for 'MigrationManager'
 - click the "Install" button
 
 ### Composer Command Line (the manual way)
+
 - Go to the command line and `cd` to your project's root folder
 - Add repository to your projects composer.json file `composer config repositories.migrationmanager vcs https://github.com/Firstborn/Craft-Migration-Manager.git`
 - Download the plugin via composer `composer require firstborn/migrationmanager`
@@ -19,6 +27,7 @@ Related: [Migration Manager for Craft 2.x](https://github.com/Firstborn/Craft-CM
 - Click the "Install" button for MigrationManager
 
 ## Overview
+
 The Migration Manager can create migrations for the following tasks:
 
 - adding and updating:
@@ -37,11 +46,11 @@ The Migration Manager can create migrations for the following tasks:
   - globals
   - users
 
-To create a migration select the elements you wish to migrate and then click the 'Create Migration' button at the bottom of the page. 
+To create a migration select the elements you wish to migrate and then click the 'Create Migration' button at the bottom of the page.
 
 ![Migration Manager](screenshots/create-migration.png)
 
-It is important to remember to create Migrations in an order that is consistent with manually creating fields, sections etc. Fields must exist before they can be added to Sections. Categories must exist before they can be used by Fields, etc. When creating migrations keep that in mind, break your migrations into smaller steps to prevent issues instead of one large migration. 
+It is important to remember to create Migrations in an order that is consistent with manually creating fields, sections etc. Fields must exist before they can be added to Sections. Categories must exist before they can be used by Fields, etc. When creating migrations keep that in mind, break your migrations into smaller steps to prevent issues instead of one large migration.
 
 A migration file will be created in the `craft/migrations` folder. The migration filename will contain the slugs/handles of the migrated items. Move the new migration file to your destination environment, ideally with version control.
 
@@ -68,6 +77,7 @@ The MigrationManager uses Craft's built in migrator to run migrations. Failed mi
 You can also view previously applied migrations by clicking the 'Applied' tab on the MigrationManager/Migrations page. This will show you migrations that have already been applied and migrations that were created locally (and don't need to be run locally). Note that if you create [blank migrations](#custom-migrations) (by clicking the Create Migration button without selecting elements) they will show up in the New Migrations list, so that you have a chance to test and run them locally with your custom migration code.
 
 ## Field type support
+
 Migration manager currently supports all core CraftCMS fields types:
 
 - Assets
@@ -90,6 +100,7 @@ Migration manager currently supports all core CraftCMS fields types:
 - Users
 
 In addition it also supports:
+
 - [SuperTable](https://github.com/engram-design/SuperTable)
 - [Neo](https://github.com/spicywebau/craft-neo)
 
@@ -98,6 +109,7 @@ To support additional field types and special content you can use event handlers
 To handle export/import of custom field types your plugin/module should listen for the Export/Import events that are triggered from elements that utilize fields. Following is the list of elements that the Migration Manager has events for that allow you to modify the export/import data to support custom fields.
 
 ### Settings
+
 - AssetSource
 - AssetTransform (only after import)
 - Categories
@@ -111,13 +123,16 @@ To handle export/import of custom field types your plugin/module should listen f
 You can also listen for export/import events on pure content migrations to modify data or perform additional actions as part of a migration.
 
 ### Content
+
 - Entries
 - Categories
 - Globals
 - Users
 
 ### Using events
-During the export event you can modify the $event->value data to include any additional settings not already in the data to be exported.
+
+During the export event you can modify the \$event->value data to include any additional settings not already in the data to be exported.
+
 ```php
 //Custom field example
 Event::on(Fields::class, Fields::EVENT_BEFORE_EXPORT_ELEMENT, function(ExportEvent $event) {
@@ -129,7 +144,8 @@ Event::on(Fields::class, Fields::EVENT_BEFORE_EXPORT_ELEMENT, function(ExportEve
 
 During the import you can modify the data before it is imported or deal with the element after it has been imported and either created or updated.
 
-Before import, the $event->element is the element model (based on handle match) to be imported (updated or created). The $event->value property is the raw data used to populate the element model. Change properties in the $event->element to modify the element before it is saved.
+Before import, the $event->element is the element model (based on handle match) to be imported (updated or created). The $event->value property is the raw data used to populate the element model. Change properties in the \$event->element to modify the element before it is saved.
+
 ```php
 //Custom fields
 Event::on(Fields::class, Fields::EVENT_BEFORE_IMPORT_ELEMENT, function(ExportEvent $event) {
@@ -140,6 +156,7 @@ Event::on(Fields::class, Fields::EVENT_BEFORE_IMPORT_ELEMENT, function(ExportEve
 ```
 
 After import you can access the $event->element and $event->value to perform additional operations related to the element if needed.
+
 ```php
 Event::on(Fields::class, Fields::EVENT_AFTER_IMPORT_ELEMENT, function(ExportEvent $event) {
    $event->value['typesettings']['special_setting'] = 'some special setting value';
@@ -147,6 +164,7 @@ Event::on(Fields::class, Fields::EVENT_AFTER_IMPORT_ELEMENT, function(ExportEven
 ```
 
 You can also cancel an import if needed and provide an error message. Error messages will be written to the Craft web log.
+
 ```php
 //Custom fields
 Event::on(Fields::class, Fields::EVENT_BEFORE_IMPORT_ELEMENT, function(ExportEvent $event) {
@@ -163,10 +181,11 @@ For importing custom fields the imported value should match the fields required 
 
 With migrations you also have the ability to create content migrations directly from element index pages (ie the entry, category and user list pages). Select the entries you wish to export and then click the 'create migration' option in the action list. Content migrations are dependent on a workflow where you migrate related/dependent elements first. For example, if you have an entry that has some selected categories, the categories need exist on the destination site before the entry migration will work correctly. This means creating a migration of the category(ies) first. This holds true for users, assets other other entries. In the case of assets you will need to ensure the matching asset (based on asset source/folder/filename) exists on the destination site. For Global values, use the 'Create Migration' button on the global screen.
 
- ![Pending Migration](screenshots/content-migration.png)
+![Pending Migration](screenshots/content-migration.png)
 
 ### Permissions
-By default all users with admin rights have full access to the Migration Manager and the ability to create content migrations. Non admin users can be granted permissions to access the Migration Manager and to create content migrations in the user/permissions section of Craft. 
+
+By default all users with admin rights have full access to the Migration Manager and the ability to create content migrations. Non admin users can be granted permissions to access the Migration Manager and to create content migrations in the user/permissions section of Craft.
 
 ## Custom migrations
 
@@ -175,6 +194,7 @@ In addition to generated migrations you can use the MigrationManger to create em
 View the [examples](EXAMPLES.md).
 
 To learn more about creating custom migrations:
+
 - [Craft CMS Official - Content Migrations](https://docs.craftcms.com/v3/content-migrations.html#creating-migrations)
 - [Craft CMS 3 Content Migration Examples](https://medium.com/mikethehud/craft-cms-3-content-migration-examples-3a377f6420c3)
 
